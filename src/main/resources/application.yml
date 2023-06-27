@@ -4,6 +4,8 @@ server:
 spring:
   datasource:
     driver-class-name: "com.mysql.cj.jdbc.Driver"
-    url: "jdbc:mysql://localhost:3306/name?characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false"
+    url: "jdbc:mysql://localhost:3306/WebChat?characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false"
     username: "root"
     password: "123456"
+  profiles:
+    active: xcc
