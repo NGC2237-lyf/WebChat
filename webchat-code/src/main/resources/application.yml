@@ -5,4 +5,8 @@ server:
 
 spring:
   profiles:
-    active: xcc
+    active: fengyang
+
+mybatis:
+  mapper-locations: classpath*:guy/mapper/*.xml
+  type-aliases-package: tyut.homework.webchat

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tyut.homework.webchat.guy.mapper.IGuyMapper">
+   <resultMap id="user" type="tyut.homework.webchat.guy.domain.User">
+      <id property="id" column="id"/>
+      <id property="id" column="my_id"/>
+      <result property="nickName" column="nick_name"/>
+      <result property="password" column="password"/>
+      <result property="email" column="email"/>
+      <result property="photo" column="photo"/>
+   </resultMap>
+   <select id="guyList"  resultType="user" parameterType="java.lang.String">
+      select my_id,`user`.*
+      FROM `user`,friend
+      WHERE guy_id = `user`.id AND `user`.nick_name = #{name}
+   </select>
+</mapper>
