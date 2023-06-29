@@ -2,7 +2,8 @@ package tyut.homework.webchat.guy.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
+import tyut.homework.webchat.guy.dto.UserGuy;
 import tyut.homework.webchat.guy.mapper.IGuyMapper;
 import tyut.homework.webchat.guy.service.IGuyService;
 
@@ -13,17 +14,13 @@ public class GuyService implements IGuyService{
     @Autowired
     IGuyMapper guyMapper;
     @Override
-    public List<User> guyList(String name) {
-        List<User> users = guyMapper.guyList(name);
-        for (User user : users) {
-            System.out.println(user);
-        }
-        return users;
+    public UserGuy guyList(String name) {
+        return guyMapper.guyList(name);
     }
 
     @Override
     public List<User> guySearch(User user) {
-        return null;
+        return guyMapper.guySearch(user);
     }
 
     @Override

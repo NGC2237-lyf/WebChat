@@ -1,29 +1,29 @@
 package tyut.homework.webchat.guy.controller.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import tyut.homework.webchat.common.utils.Result;
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
+import tyut.homework.webchat.guy.dto.UserGuy;
 import tyut.homework.webchat.guy.service.impl.GuyService;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/guy")
 public class GuyController {
     @Autowired
     GuyService guyService;
 
-    @GetMapping("/list")
-    @ResponseBody
-    public List<User> guyList(String name) {
+    @PostMapping("/list")
+    public UserGuy guyList(String name) {
         return guyService.guyList(name);
     }
 
-    public Result guySearch(String remark) {
-        return null;
+    @PostMapping("/search")
+    public List<User> guySearch(User user) {
+        return guyService.guySearch(user);
     }
 
     public void guyDelete(String name) {

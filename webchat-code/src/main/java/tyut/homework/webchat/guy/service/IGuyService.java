@@ -1,11 +1,12 @@
 package tyut.homework.webchat.guy.service;
 
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
+import tyut.homework.webchat.guy.dto.UserGuy;
 
 import java.util.List;
 
 public interface IGuyService {
-    List<User> guyList(String name);
+    UserGuy guyList(String name);
 
     List<User> guySearch(User user);
 
