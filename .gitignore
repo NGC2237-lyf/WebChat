@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 个人的配置文件 ###
+webchat-code/src/main/resources/application-lyf.yml
