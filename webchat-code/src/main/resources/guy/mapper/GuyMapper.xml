@@ -8,12 +8,13 @@
         <id property="guyId" column="guy_id"/>
         <result property="remark" column="remark"/>
         <collection property="guys" ofType="User">
+            <id property="id" column="id"/>
             <result property="nickName" column="nick_name"/>
             <result property="email" column="email"/>
             <result property="photo" column="photo"/>
         </collection>
     </resultMap>
-    <select id="guyList" resultMap="user" parameterType="java.lang.String">
+    <select id="guyList" resultMap="user" parameterType="int">
         SELECT friend.my_id, friend.remark, `user`.id, `user`.nick_name, `user`.email, `user`.photo
         FROM `user`
         INNER JOIN friend
@@ -22,7 +23,7 @@
                                                 FROM friend
                                                 INNER JOIN `user`
                                                 ON friend.my_id = `user`.id
-                                                WHERE `user`.nick_name = #{name})
+                                                WHERE `user`.id = #{id})
     </select>
 
     <resultMap id="userSearch" type="tyut.homework.webchat.common.domain.User">
@@ -31,22 +32,53 @@
         <result property="email" column="email"/>
         <result property="photo" column="photo"/>
     </resultMap>
-    <select id="guySearch" resultMap="userSearch" parameterType="tyut.homework.webchat.common.domain.User">
+
+    <select id="guySearch" resultMap="userSearch">
         SELECT `user`.id, `user`.nick_name, `user`.email , `user`.photo
         FROM `user`
         <where>
             <choose>
-                <when test="nick_name != null and nick_name != '' ">
-                    nick_name like concat('%',#{nickName},'%')
+                <when test="user.nickName != null and user.nickName != '' ">
+                    binary nick_name like concat('%',#{user.nickName},'%')
                 </when>
-                <when test="id != null and id != '' ">
-                    id = #{id}
+                <when test="user.id != null and user.id != '' ">
+                    id = #{user.id}
                 </when>
-                <when test="email != null and email != '' ">
-                    email = #{email}
+                <when test="user.email != null and user.email != '' ">
+                    email = #{user.email}
                 </when>
+                <otherwise>
+                    1 = 2
+                </otherwise>
             </choose>
         </where>
     </select>
+    
+    <select id="guyInfo" resultMap="userSearch">
+        SELECT `user`.id ,friend.remark,`user`.nick_name,`user`.email,`user`.photo
+        FROM  `user`
+                  INNER JOIN friend
+                             ON `user`.id = friend.guy_id
+        WHERE friend.my_id = #{userGuy.myId} AND (`user`.id) IN (SELECT friend.guy_id
+                                                   FROM friend
+                                                            INNER JOIN `user`
+                                                                       ON friend.my_id = `user`.id
+                                                   WHERE `user`.id = #{userGuy.myId} ) AND friend.guy_id = #{userGuy.guyId}
 
+    </select>
+    <delete id="guyDelete">
+        DELETE FROM friend WHERE my_id = #{myId} and guy_id = #{guyId}
+    </delete>
+
+    <insert id="guyAdd" parameterType="tyut.homework.webchat.guy.dto.UserGuy">
+        INSERT INTO friend(my_id,guy_id,remark)
+        VALUES (#{userGuy.myId},#{userGuy.guyId},#{userGuy.remark})
+    </insert>
+
+    <update id="guyRemarkUpdate">
+        update friend
+        set remark = #{remark}
+        where my_id = #{userGuy.myId} and guy_id = #{userGuy.guyId}
+    </update>
+    
 </mapper>

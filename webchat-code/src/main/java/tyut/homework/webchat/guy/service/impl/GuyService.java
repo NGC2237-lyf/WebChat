@@ -14,8 +14,8 @@ public class GuyService implements IGuyService{
     @Autowired
     IGuyMapper guyMapper;
     @Override
-    public UserGuy guyList(String name) {
-        return guyMapper.guyList(name);
+    public UserGuy guyList(int account) {
+        return guyMapper.guyList(account);
     }
 
     @Override
@@ -24,17 +24,25 @@ public class GuyService implements IGuyService{
     }
 
     @Override
-    public boolean guyAdd(User user) {
+    public boolean guyAdd(UserGuy userGuy) {
+        guyMapper.guyAdd(userGuy);
         return false;
     }
 
     @Override
-    public boolean guyDelete(String name) {
+    public boolean guyDelete(String myName,String guyName) {
+        guyMapper.guyDelete(1,1);
         return false;
     }
 
     @Override
-    public User guyDetail(String name) {
-        return null;
+    public boolean guyRemarkUpdate(String remark, UserGuy userGuy) {
+        guyMapper.guyRemarkUpdate(remark,userGuy);
+        return false;
+    }
+
+    @Override
+    public User guyDetail(UserGuy userGuy) {
+        return guyMapper.guyInfo(userGuy);
     }
 }

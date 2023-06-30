@@ -6,13 +6,13 @@ import tyut.homework.webchat.guy.dto.UserGuy;
 import java.util.List;
 
 public interface IGuyService {
-    UserGuy guyList(String name);
+    UserGuy guyList(int account);
 
     List<User> guySearch(User user);
 
-    boolean guyAdd(User user);
+    boolean guyAdd(UserGuy userGuy);
 
-    boolean guyDelete(String name);
-
-    User guyDetail(String name);
+    boolean guyDelete(String myName,String guyName);
+    boolean guyRemarkUpdate(String remark,UserGuy userGuy);
+    User guyDetail(UserGuy userGuy);
 }

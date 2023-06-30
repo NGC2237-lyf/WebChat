@@ -1,9 +1,7 @@
 package tyut.homework.webchat.guy.controller.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tyut.homework.webchat.common.domain.User;
 import tyut.homework.webchat.guy.dto.UserGuy;
 import tyut.homework.webchat.guy.service.impl.GuyService;
@@ -17,24 +15,32 @@ public class GuyController {
     GuyService guyService;
 
     @PostMapping("/list")
-    public UserGuy guyList(String name) {
-        return guyService.guyList(name);
+    public UserGuy guyList(@RequestParam("account") int account) {
+        return guyService.guyList(account);
     }
 
     @PostMapping("/search")
-    public List<User> guySearch(User user) {
+    public List<User> guySearch(@RequestBody User user) {
         return guyService.guySearch(user);
     }
 
-    public void guyDelete(String name) {
-
+    @PostMapping("/delete")
+    public void guyDelete(@RequestParam("myName") String myName,@RequestParam("guyName") String guyName) {
+        guyService.guyDelete(myName, guyName);
     }
 
-    public void guyAdd(User user) {
-
+    @PostMapping("/add")
+    public void guyAdd(@RequestBody UserGuy userGuy) {
+        guyService.guyAdd(userGuy);
     }
 
-    public void guyDetail(String name) {
+    @PostMapping("/remark")
+    public void guyRemarkUpdate(@RequestParam("remark") String remark, @RequestBody UserGuy userGuy){
+        guyService.guyRemarkUpdate(remark, userGuy);
+    }
 
+    @PostMapping("/detail")
+    public User guyDetail(@RequestBody UserGuy userGuy) {
+        return guyService.guyDetail(userGuy);
     }
 }
