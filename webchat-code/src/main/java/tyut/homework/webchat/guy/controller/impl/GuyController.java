@@ -25,8 +25,8 @@ public class GuyController {
     }
 
     @PostMapping("/delete")
-    public void guyDelete(@RequestParam("myName") String myName,@RequestParam("guyName") String guyName) {
-        guyService.guyDelete(myName, guyName);
+    public void guyDelete(@RequestParam("myId") int myId,@RequestParam("guyId") int guyId) {
+        guyService.guyDelete(myId, guyId);
     }
 
     @PostMapping("/add")

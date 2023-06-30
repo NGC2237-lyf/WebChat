@@ -38,11 +38,11 @@
         FROM `user`
         <where>
             <choose>
+                <when test="user.id != null and user.id != '' ">
+                id = #{user.id}
+                </when>
                 <when test="user.nickName != null and user.nickName != '' ">
                     binary nick_name like concat('%',#{user.nickName},'%')
-                </when>
-                <when test="user.id != null and user.id != '' ">
-                    id = #{user.id}
                 </when>
                 <when test="user.email != null and user.email != '' ">
                     email = #{user.email}

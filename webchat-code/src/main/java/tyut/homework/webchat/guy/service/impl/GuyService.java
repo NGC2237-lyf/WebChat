@@ -10,9 +10,10 @@ import tyut.homework.webchat.guy.service.IGuyService;
 import java.util.List;
 
 @Service
-public class GuyService implements IGuyService{
+public class GuyService implements IGuyService {
     @Autowired
     IGuyMapper guyMapper;
+
     @Override
     public UserGuy guyList(int account) {
         return guyMapper.guyList(account);
@@ -20,29 +21,57 @@ public class GuyService implements IGuyService{
 
     @Override
     public List<User> guySearch(User user) {
-        return guyMapper.guySearch(user);
+        List<User> users = guyMapper.guySearch(user);
+        if (users.isEmpty()) {
+            System.err.println("用户不存在");
+            return null;
+        }
+        return users;
     }
 
     @Override
     public boolean guyAdd(UserGuy userGuy) {
+        if (isContainGuy(userGuy)) {
+            return false;
+        }
         guyMapper.guyAdd(userGuy);
-        return false;
+        return true;
     }
 
     @Override
-    public boolean guyDelete(String myName,String guyName) {
-        guyMapper.guyDelete(1,1);
-        return false;
+    public boolean guyDelete(int myId, int guyId) {
+        guyMapper.guyDelete(myId, guyId);
+        return true;
     }
 
     @Override
     public boolean guyRemarkUpdate(String remark, UserGuy userGuy) {
-        guyMapper.guyRemarkUpdate(remark,userGuy);
+        guyMapper.guyRemarkUpdate(remark, userGuy);
         return false;
     }
 
     @Override
     public User guyDetail(UserGuy userGuy) {
         return guyMapper.guyInfo(userGuy);
+    }
+
+    public boolean isContainGuy(UserGuy userGuy) {
+        //查看好友列表是否还有已添加的成员
+        //查看好友列表
+        List<User> guys = guyMapper.guyList(userGuy.getMyId()).getGuys();
+        //查看好友列表是否已经包含已搜索成员
+        if (guys.contains(guyMapper.guyInfo(userGuy))) {
+            System.err.println("该好友已经存在您的好友列表");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addYourself(int id){
+        UserGuy userGuy = new UserGuy();
+        userGuy.setMyId(id);
+        userGuy.setGuyId(id);
+        guyMapper.guyAdd(userGuy);
+        return true;
     }
 }
