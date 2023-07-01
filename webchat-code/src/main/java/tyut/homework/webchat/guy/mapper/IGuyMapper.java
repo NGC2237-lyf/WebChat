@@ -11,7 +11,7 @@ import java.util.List;
 public interface IGuyMapper {
     List<User> guyList(@Param("name") String name);
 
-    User getUserByNickName(@Param("nickName")String nickName);
+    User getUserByEmail(@Param("email")String email);
 
     User findUserByEmail(@Param("email")String email);
 

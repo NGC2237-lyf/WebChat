@@ -5,7 +5,7 @@ import tyut.homework.webchat.common.domain.User;
 public interface ILoginService {
 
     //登陆校验
-    public User judgeMsg(String nickName,String password);
+    public User judgeMsg(String email,String password);
 
     //查看数据库是否已存在邮箱
     public User isExistEmail(String email);

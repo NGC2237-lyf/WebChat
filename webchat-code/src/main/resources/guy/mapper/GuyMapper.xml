@@ -27,10 +27,10 @@
       WHERE guy_id = `user`.id AND `user`.nick_name = #{name}
    </select>
 
-   <select id="getUserByNickName" resultType="tyut.homework.webchat.guy.domain.User">
+   <select id="getUserByEmail" resultType="tyut.homework.webchat.guy.domain.User">
       select *
       FROM `user`
-      WHERE nick_name = #{nickName};
+      WHERE email = #{email};
    </select>
 
    <select id="findUserByEmail" resultType="tyut.homework.webchat.guy.domain.User">

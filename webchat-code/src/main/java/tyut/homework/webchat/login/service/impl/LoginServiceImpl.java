@@ -19,18 +19,18 @@ public class LoginServiceImpl implements ILoginService {
 
     /**
      * 校验用户信息
-     * @param nickName 账号
+     * @param email 账号
      * @param password 密码
      * @return
      */
     @Override
-    public User judgeMsg(String nickName, String password) {
+    public User judgeMsg(String email, String password) {
         //非空判断
-        if (nickName == null || password == null){
+        if (email == null || password == null){
             throw new LoginMsgException("请填写账号密码");
         }
         //从数据库提取数据
-        User userByNickName = iGuyMapper.getUserByNickName(nickName);
+        User userByNickName = iGuyMapper.getUserByEmail(email);
         //数据库是否有数据
         if (userByNickName == null){
             throw new LoginMsgException("数据库暂无数据");
