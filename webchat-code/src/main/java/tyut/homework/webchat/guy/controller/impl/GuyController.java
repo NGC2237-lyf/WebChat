@@ -3,6 +3,7 @@ package tyut.homework.webchat.guy.controller.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tyut.homework.webchat.common.domain.User;
+import tyut.homework.webchat.common.utils.Result;
 import tyut.homework.webchat.guy.dto.UserGuy;
 import tyut.homework.webchat.guy.service.impl.GuyService;
 
@@ -15,8 +16,8 @@ public class GuyController {
     GuyService guyService;
 
     @PostMapping("/list")
-    public UserGuy guyList(@RequestParam("account") int account) {
-        return guyService.guyList(account);
+    public Result guyList(@RequestParam("account") int account) {
+        return Result.success(guyService.guyList(account));
     }
 
     @PostMapping("/search")
