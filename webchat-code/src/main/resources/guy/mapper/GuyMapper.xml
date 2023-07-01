@@ -11,9 +11,31 @@
       <result property="email" column="email"/>
       <result property="photo" column="photo"/>
    </resultMap>
+
+   <insert id="insertDataByEmail">
+      insert into `user` values (
+                                 #{user.nickName},#{user.email},#{user.password},#{user.photo}
+                                );
+   </insert>
+
+
+
    <select id="guyList"  resultType="user" parameterType="java.lang.String">
       select my_id,`user`.*
       FROM `user`,friend
       WHERE guy_id = `user`.id AND `user`.nick_name = #{name}
    </select>
+
+   <select id="getUserByNickName" resultType="tyut.homework.webchat.guy.domain.User">
+      select *
+      FROM `user`
+      WHERE nick_name = #{nickName};
+   </select>
+
+   <select id="findUserByEmail" resultType="tyut.homework.webchat.guy.domain.User">
+      select *
+      FROM `user`
+      WHERE email = #{email};
+   </select>
+
 </mapper>

@@ -22,4 +22,13 @@ public class User {
                 ", email='" + email + '\'' +
                 '}';
     }
+
+    public User(String nickName, String password, String email) {
+        this.nickName = nickName;
+        this.password = password;
+        this.email = email;
+    }
+
+    public User() {
+    }
 }
