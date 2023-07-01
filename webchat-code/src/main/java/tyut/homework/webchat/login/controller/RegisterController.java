@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tyut.homework.webchat.common.utils.Result;
 import tyut.homework.webchat.common.utils.ValidateCodeUtils;
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
 import tyut.homework.webchat.login.dto.RegisterDTO;
 import tyut.homework.webchat.login.service.ILoginService;
 

@@ -1,6 +1,6 @@
 package tyut.homework.webchat.login.service;
 
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
 
 public interface ILoginService {
 

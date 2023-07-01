@@ -2,7 +2,7 @@ package tyut.homework.webchat.login.dto;
 
 import lombok.Data;
 import lombok.NonNull;
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
 
 @Data
 public class RegisterDTO {

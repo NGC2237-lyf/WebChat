@@ -2,7 +2,7 @@ package tyut.homework.webchat.login.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tyut.homework.webchat.guy.domain.User;
+import tyut.homework.webchat.common.domain.User;
 import tyut.homework.webchat.guy.mapper.IGuyMapper;
 import tyut.homework.webchat.login.Exception.LoginMsgException;
 import tyut.homework.webchat.login.service.ILoginService;
