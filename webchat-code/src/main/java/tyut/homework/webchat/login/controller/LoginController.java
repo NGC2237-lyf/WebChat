@@ -42,7 +42,7 @@ public class LoginController {
             return Result.error("验证码不正确");
         }
         //判断用户信息是否正确
-        String email = loginDTO.getEamil();
+        String email = loginDTO.getEmail();
         String password = loginDTO.getPassword();
         return Result.success(iLoginService.judgeMsg(email, password));
     }
