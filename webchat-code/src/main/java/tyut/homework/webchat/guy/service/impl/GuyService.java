@@ -47,7 +47,7 @@ public class GuyService implements IGuyService {
     @Override
     public boolean guyRemarkUpdate(String remark, UserGuy userGuy) {
         guyMapper.guyRemarkUpdate(remark, userGuy);
-        return false;
+        return true;
     }
 
     @Override
