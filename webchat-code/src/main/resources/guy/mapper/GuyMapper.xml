@@ -3,17 +3,47 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tyut.homework.webchat.guy.mapper.IGuyMapper">
+
     <resultMap id="user" type="tyut.homework.webchat.guy.dto.UserGuy">
         <id property="myId" column="my_id"/>
         <id property="guyId" column="guy_id"/>
         <result property="remark" column="remark"/>
-        <collection property="guys" ofType="User">
+        <collection property="guys" ofType="tyut.homework.webchat.common.domain.User">
             <id property="id" column="id"/>
             <result property="nickName" column="nick_name"/>
             <result property="email" column="email"/>
             <result property="photo" column="photo"/>
         </collection>
     </resultMap>
+
+
+    <resultMap id="userSearch" type="tyut.homework.webchat.common.domain.User">
+        <id property="id" column="id"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="email" column="email"/>
+        <result property="photo" column="photo"/>
+    </resultMap>
+
+
+    <insert id="insertDataByEmail">
+        insert into `user` values (
+                                      #{user.nickName},#{user.email},#{user.password},#{user.photo}
+                                  );
+    </insert>
+
+
+    <select id="getUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
+        select *
+        FROM `user`
+        WHERE email = #{email};
+    </select>
+
+    <select id="findUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
+        select *
+        FROM `user`
+        WHERE email = #{email};
+    </select>
+
     <select id="guyList" resultMap="user" parameterType="int">
         SELECT friend.my_id, friend.remark, `user`.id, `user`.nick_name, `user`.email, `user`.photo
         FROM `user`
@@ -25,13 +55,6 @@
                                                 ON friend.my_id = `user`.id
                                                 WHERE `user`.id = #{id})
     </select>
-
-    <resultMap id="userSearch" type="tyut.homework.webchat.common.domain.User">
-        <id property="id" column="id"/>
-        <result property="nickName" column="nick_name"/>
-        <result property="email" column="email"/>
-        <result property="photo" column="photo"/>
-    </resultMap>
 
     <select id="guySearch" resultMap="userSearch">
         SELECT `user`.id, `user`.nick_name, `user`.email , `user`.photo

@@ -9,6 +9,13 @@ import java.util.List;
 
 @Repository
 public interface IGuyMapper {
+    List<User> guyList(@Param("name") String name);
+
+    User getUserByEmail(@Param("email")String email);
+
+    User findUserByEmail(@Param("email")String email);
+
+    int insertDataByEmail(@Param("user")User user);
     /**
      * 根据昵称查询好友列表
      *

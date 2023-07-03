@@ -7,8 +7,6 @@ import tyut.homework.webchat.common.utils.Result;
 import tyut.homework.webchat.guy.dto.UserGuy;
 import tyut.homework.webchat.guy.service.impl.GuyService;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/guy")
 public class GuyController {
@@ -21,8 +19,8 @@ public class GuyController {
     }
 
     @PostMapping("/search")
-    public List<User> guySearch(@RequestBody User user) {
-        return guyService.guySearch(user);
+    public Result guySearch(@RequestBody User user) {
+        return Result.success(guyService.guySearch(user));
     }
 
     @PostMapping("/delete")
@@ -41,7 +39,7 @@ public class GuyController {
     }
 
     @PostMapping("/detail")
-    public User guyDetail(@RequestBody UserGuy userGuy) {
-        return guyService.guyDetail(userGuy);
+    public Result guyDetail(@RequestBody UserGuy userGuy) {
+        return Result.success(guyService.guyDetail(userGuy));
     }
 }
