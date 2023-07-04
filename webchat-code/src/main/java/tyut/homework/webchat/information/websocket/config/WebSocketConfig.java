@@ -18,13 +18,17 @@ import tyut.homework.webchat.information.websocket.interceptor.WebSocketIntercep
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Autowired
-    private ChatHandler chatHandler;
+    private static ChatHandler chatHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(chatHandler,"/chat")
                 .addInterceptors(new WebSocketInterceptor())
                 .setAllowedOrigins("*");
+    }
+
+    @Autowired
+    public void setChatHandler(ChatHandler chatHandler) {
+        WebSocketConfig.chatHandler = chatHandler;
     }
 }

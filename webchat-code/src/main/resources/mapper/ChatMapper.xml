@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="tyut.homework.webchat.information.mapper.ChatMapper">
+    <resultMap id="MessageMap" type="tyut.homework.webchat.information.entity.Message">
+        <id column="userId" property="userId"/>
+        <result column="opposite" property="oppositeId"/>
+        <result column="message_type" property="messageType"/>
+        <result column="data_type" property="dataType"/>
+        <result column="info" property="info"/>
+        <result column="file_name" property="fileName"/>
+        <result column="date_time" property="dateTime"/>
+    </resultMap>
+
+    <insert id="insertRecord">
+        insert into chat_record values (#{message.userId},#{message.oppositeId},#{message.messageType},#{message.dataType},#{message.info},#{message.dateTime})
+    </insert>
+
+    <select id="getRecord" resultMap="MessageMap">
+        select * from chat_record order by date_time desc limit #{num}
+    </select>
+</mapper>
