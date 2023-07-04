@@ -1,10 +1,14 @@
 package tyut.homework.webchat.information.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import tyut.homework.webchat.information.cache.service.HistoryService;
+import tyut.homework.webchat.information.entity.Message;
+import tyut.homework.webchat.information.utils.RedisUtil;
 import tyut.homework.webchat.information.websocket.handler.ChatHandler;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author TokisakiKurumi
@@ -12,15 +16,30 @@ import tyut.homework.webchat.information.websocket.handler.ChatHandler;
  * @date 2023/6/27
  * @description
  **/
-@RestController("/information")
+@RestController
+@RequestMapping("/information")
 public class ChatController {
 
     @Autowired
     private ChatHandler chatHandler;
 
+    @Autowired
+    private HistoryService historyService;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
     @GetMapping("/population")
-    @ResponseBody
-    public String getPopulation() {
-       return chatHandler.getPopulation();
+    public Set<String> getPopulation() {
+        return chatHandler.getPopulation();
+    }
+
+    @PostMapping("/history/{num}")
+    public List<Message> getHistory(@PathVariable("num") int num) {
+        boolean result = historyService.getHistory(num);
+        if (result) {
+            return (List<Message>) redisUtil.listRange("history",0,redisUtil.listLen("history"));
+        }
+        return null;
     }
 }

@@ -35,5 +35,7 @@ public class GuyMapper {
         }
         guyMapper.insertDataByEmail(new User("123","123456","514565",binaryData));
     }
+    public static void main(String[] args) {
 
+    }
 }
