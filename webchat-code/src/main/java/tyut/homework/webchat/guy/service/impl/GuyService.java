@@ -71,7 +71,7 @@ public class GuyService implements IGuyService {
         return false;
     }
 
-    public boolean addYourself(int id){
+    public boolean addYourself(int id) {
         UserGuy userGuy = new UserGuy();
         userGuy.setMyId(id);
         userGuy.setGuyId(id);

@@ -26,22 +26,17 @@
 
 
     <insert id="insertDataByEmail">
-        insert into `user`
-        values (#{user.nickName}, #{user.email}, #{user.password}, #{user.photo});
+        insert into `user` (nick_name, password, email, photo)
+        values (#{user.nickName}, #{user.password}, #{user.email}, #{user.photo});
     </insert>
 
 
-    <select id="getUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
+    <select id="getUserByEmail" resultType="tyut.homework.webchat.common.domain.User" resultMap="userSearch">
         select *
         FROM `user`
         WHERE email = #{email};
     </select>
 
-    <select id="findUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
-        select *
-        FROM `user`
-        WHERE email = #{email};
-    </select>
 
     <select id="guyList" resultMap="user" parameterType="int">
         SELECT friend.my_id, friend.remark, `user`.id, `user`.nick_name, `user`.email, `user`.photo
@@ -90,6 +85,13 @@
           AND friend.guy_id = #{userGuy.guyId}
 
     </select>
+
+    <select id="getUserById" resultType="tyut.homework.webchat.common.domain.User">
+        select *
+        FROM `user`
+        WHERE id = #{id};
+    </select>
+
     <delete id="guyDelete">
         DELETE
         FROM friend

@@ -24,22 +24,22 @@ public class GuyController {
     }
 
     @PostMapping("/delete")
-    public Result guyDelete(@RequestParam("myId") int myId,@RequestParam("guyId") int guyId) {
+    public Result guyDelete(@RequestParam("myId") int myId, @RequestParam("guyId") int guyId) {
         guyService.guyDelete(myId, guyId);
         return Result.success("删除好友成功");
     }
 
     @PostMapping("/add")
     public Result guyAdd(@RequestBody UserGuy userGuy) {
-        if(guyService.guyAdd(userGuy)){
+        if (guyService.guyAdd(userGuy)) {
             Result.success("好友添加成功");
         }
         return Result.error("该好友已经存在您的好友列表");
     }
 
     @PostMapping("/remark")
-    public Result guyRemarkUpdate(@RequestParam("remark") String remark, @RequestBody UserGuy userGuy){
-        if(guyService.guyRemarkUpdate(remark, userGuy)){
+    public Result guyRemarkUpdate(@RequestParam("remark") String remark, @RequestBody UserGuy userGuy) {
+        if (guyService.guyRemarkUpdate(remark, userGuy)) {
             return Result.success("修改昵称成功");
         }
         return Result.error("修改昵称失败");
