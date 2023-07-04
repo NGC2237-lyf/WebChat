@@ -38,11 +38,6 @@
         WHERE email = #{email};
     </select>
 
-    <select id="findUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
-        select *
-        FROM `user`
-        WHERE email = #{email};
-    </select>
 
     <select id="guyList" resultMap="user" parameterType="int">
         SELECT friend.my_id, friend.remark, `user`.id, `user`.nick_name, `user`.email, `user`.photo

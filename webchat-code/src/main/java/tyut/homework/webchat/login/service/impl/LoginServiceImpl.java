@@ -44,7 +44,7 @@ public class LoginServiceImpl implements ILoginService {
 
     @Override
     public User isExistEmail(String email) {
-        return iGuyMapper.findUserByEmail(email);
+        return iGuyMapper.getUserByEmail(email);
     }
 
 
