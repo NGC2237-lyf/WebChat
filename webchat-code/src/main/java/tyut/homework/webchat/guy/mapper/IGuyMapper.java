@@ -62,4 +62,7 @@ public interface IGuyMapper {
      * @return
      */
     User guyInfo(@Param("userGuy") UserGuy userGuy);
+
+
+    List<User> addMessage(@Param("account") int account);
 }

@@ -32,7 +32,7 @@ public class GuyController {
     @PostMapping("/add")
     public Result guyAdd(@RequestBody UserGuy userGuy) {
         if(guyService.guyAdd(userGuy)){
-            Result.success("添加好友成功");
+            Result.success("好友添加成功");
         }
         return Result.error("该好友已经存在您的好友列表");
     }
@@ -49,4 +49,5 @@ public class GuyController {
     public Result guyDetail(@RequestBody UserGuy userGuy) {
         return Result.success(guyService.guyDetail(userGuy));
     }
+
 }
