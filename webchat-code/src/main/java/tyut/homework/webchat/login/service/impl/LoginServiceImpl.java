@@ -7,9 +7,9 @@ import tyut.homework.webchat.guy.mapper.IGuyMapper;
 import tyut.homework.webchat.login.Exception.LoginMsgException;
 import tyut.homework.webchat.login.service.ILoginService;
 
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 @Service
 public class LoginServiceImpl implements ILoginService {
@@ -47,18 +47,17 @@ public class LoginServiceImpl implements ILoginService {
         return iGuyMapper.findUserByEmail(email);
     }
 
+
     @Override
     public int insertDBByEmail(User user) {
         FileInputStream fileInputStream = null;
         byte[] binaryData = null;
-        URL resource = getClass().getClassLoader().getResource("webchat-code/src/main/resources/photo/initPhoto.jpg");
+        String url = "webchat-code/src/main/resources/photo/initPhoto.jpg";
         try {
-            File file = new File(resource.toURI());
+            File file = new File(url);
             fileInputStream = new FileInputStream(file);
             binaryData = new byte[(int) file.length()];
             fileInputStream.read(binaryData);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }finally {
@@ -70,7 +69,6 @@ public class LoginServiceImpl implements ILoginService {
         }
         //设置默认头像
         user.setPhoto(binaryData);
-        iGuyMapper.insertDataByEmail(user);
-        return 0;
+        return iGuyMapper.insertDataByEmail(user);
     }
 }

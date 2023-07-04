@@ -18,4 +18,12 @@ public class User {
 
     public User() {
     }
+
+    public User(String nickName, String password, String email, byte[] photo) {
+        this.nickName = nickName;
+        this.password = password;
+        this.email = email;
+        this.photo = photo;
+    }
+
 }
