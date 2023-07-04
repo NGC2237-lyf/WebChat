@@ -13,6 +13,8 @@ public interface IGuyMapper {
 
     User getUserByEmail(@Param("email")String email);
 
+    User getUserById(@Param("id")String id);
+
     int insertDataByEmail(@Param("user")User user);
     /**
      * 根据昵称查询好友列表

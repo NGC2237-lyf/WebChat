@@ -19,25 +19,25 @@ public class LoginServiceImpl implements ILoginService {
 
     /**
      * 校验用户信息
-     * @param email 账号
+     * @param id 账号
      * @param password 密码
      * @return
      */
     @Override
-    public User judgeMsg(String email, String password) {
+    public User judgeMsg(String id, String password) {
         //非空判断
-        if (email == null || password == null){
-            throw new LoginMsgException("请填写账号密码");
+        if (id == null || password == null){
+            throw new LoginMsgException("请填写正确的账号密码");
         }
         //从数据库提取数据
-        User userByNickName = iGuyMapper.getUserByEmail(email);
+        User userById = iGuyMapper.getUserById(id);
         //数据库是否有数据
-        if (userByNickName == null){
+        if (userById == null){
             throw new LoginMsgException("数据库暂无数据");
         }
         //校验密码是否正确
-        if (userByNickName.getPassword().equals(password)){
-            return userByNickName;
+        if (userById.getPassword().equals(password)){
+            return userById;
         }
         throw new LoginMsgException("密码不正确");
     }
@@ -69,6 +69,8 @@ public class LoginServiceImpl implements ILoginService {
         }
         //设置默认头像
         user.setPhoto(binaryData);
-        return iGuyMapper.insertDataByEmail(user);
+        iGuyMapper.insertDataByEmail(user);
+        User userByEmail = iGuyMapper.getUserByEmail(user.getEmail());
+        return userByEmail.getId();
     }
 }

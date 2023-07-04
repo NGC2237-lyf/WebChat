@@ -41,14 +41,11 @@ public class RegisterController {
                 return Result.error("验证码填写错误");
             }
             //注册成功，插入数据
-            int i = iLoginService.insertDBByEmail(new User(nickName, password,email));
-            if (i == 1) {
-                return Result.success("注册成功");
-            }
+            int id = iLoginService.insertDBByEmail(new User(nickName, password,email));
+            return Result.success("注册成功，用户id为"+id);
         }else{
-            return Result.error("注册失败，该账户已存在");
+            return Result.error("注册失败，该账户已存在，id为"+existEmail.getId());
         }
-        return Result.error("其他未知错误，请联系写java的那个");
     }
 
     /**

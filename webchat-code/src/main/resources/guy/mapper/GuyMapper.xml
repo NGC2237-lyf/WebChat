@@ -84,6 +84,13 @@
                                                    WHERE `user`.id = #{userGuy.myId} ) AND friend.guy_id = #{userGuy.guyId}
 
     </select>
+
+    <select id="getUserById" resultType="tyut.homework.webchat.common.domain.User">
+        select *
+        FROM `user`
+        WHERE id = #{id};
+    </select>
+
     <delete id="guyDelete">
         DELETE FROM friend WHERE my_id = #{myId} and guy_id = #{guyId}
     </delete>

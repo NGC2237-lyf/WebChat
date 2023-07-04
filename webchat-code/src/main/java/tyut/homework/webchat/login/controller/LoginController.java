@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tyut.homework.webchat.common.utils.Result;
-import tyut.homework.webchat.login.dto.LoginDTO;
 import tyut.homework.webchat.login.service.ILoginService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,12 +31,9 @@ public class LoginController {
      * @return
      */
     @PostMapping("/check")
-    public Result Check(String verifyCode,String email,String password, HttpSession session){
-        LoginDTO loginDTO = new LoginDTO(email,password,verifyCode);
+    public Result Check(String verifyCode,String id,String password, HttpSession session){
         //获取验证码
         String oldVerifyCode= this.verifyCode;
-        //判断验证码是否正确
-//        String verifyCode = loginDTO.getVerifyCode();
         //非空判断
         if (verifyCode == null){
             return Result.error("验证码不能为空");
@@ -45,10 +41,7 @@ public class LoginController {
         if (!verifyCode.equals(oldVerifyCode)){
             return Result.error("验证码不正确");
         }
-        //判断用户信息是否正确
-//        String email = loginDTO.getEmail();
-//        String password = loginDTO.getPassword();
-        return Result.success(iLoginService.judgeMsg(email, password));
+        return Result.success(iLoginService.judgeMsg(id, password));
     }
 
 
