@@ -1,6 +1,12 @@
 package tyut.homework.webchat.common.utils;
 
-public class Result {
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Data;
+
+import java.io.Serializable;
+
+@Data
+public class Result implements Serializable {
     private int code;//状态码
 
     private String msg;//提示信息

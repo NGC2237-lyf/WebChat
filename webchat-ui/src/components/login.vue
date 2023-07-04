@@ -15,7 +15,8 @@
         <input
           class="tbx"
           type="text"
-          placeholder="账号"
+          placeholder="邮箱"
+          v-model="loginInfo.email"
           @focus="closeOutControl"
           @blur="openOutControl"
         />
@@ -23,10 +24,24 @@
           class="tbx"
           type="password"
           placeholder="密码"
+          v-model="loginInfo.password"
           @focus="closeOutControl"
           @blur="openOutControl"
         />
-        <input type="submit" value="登录" class="sub" />
+        <div class="verify-box">
+          <input
+            class="tbx"
+            type="text"
+            style="width: 100px"
+            placeholder="验证码"
+            v-model="loginInfo.verifyCode"
+            @focus="closeOutControl"
+            @blur="openOutControl"
+          />
+          <img :src="verifyImg" class="verify" @click="getVerifyImg" />
+        </div>
+
+        <input type="button" value="登录" class="sub" @click="startChat" />
         <input type="button" value="注册" class="sub" @click="gotoRegister" />
       </form>
       <span
@@ -63,18 +78,35 @@
           <div class="login_box">
             <!-- required就是不能为空 必须在css效果中有很大的作用 -->
             <!-- 可以简写为required -->
-            <input type="text" required /><label>昵称</label>
+            <input type="text" required v-model="registerInfo.nickName" /><label
+              >昵称</label
+            >
           </div>
           <div class="login_box">
-            <input type="password" required="required" /><label>密码</label>
+            <input
+              type="password"
+              required="required"
+              v-model="registerInfo.password"
+            /><label>密码</label>
           </div>
           <div class="login_box">
-            <input type="password" required="required" /><label>性别</label>
+            <input
+              type="text"
+              required="required"
+              v-model="registerInfo.email"
+            /><label>邮箱</label>
           </div>
           <div class="login_box">
-            <input type="password" required="required" /><label>邮箱</label>
+            <input
+              type="text"
+              required="required"
+              v-model="registerInfo.code"
+            /><label>验证码</label>
+            <button class="sendVerify" @click="getEmailCode">
+              {{ verifyText }}
+            </button>
           </div>
-          <a href="javascript:void(0)">
+          <a @click="startRegister">
             注册
             <span></span>
             <span></span>
@@ -88,6 +120,8 @@
 </template>
 
 <script>
+import Login from "@/api/login/index.js";
+import { useRouter } from "vue-router";
 import { ref, reactive, onMounted, computed } from "vue";
 export default {
   name: "login",
@@ -95,12 +129,32 @@ export default {
     //是否可以进入
     let isIn = ref(true);
 
+    let loginInfo = reactive({
+      email: "",
+      password: "",
+      verifyCode: "",
+    });
+
+    let registerInfo = reactive({
+      nickName: "",
+      password: "",
+      code: "",
+      email: "",
+    });
+
+    let login = new Login();
+
+    let router = useRouter();
+
     //是否可以退出
     let isOut = ref(false);
 
     //函数执行控制器
     let inControl = ref(true);
     let outControl = ref(false);
+
+    //验证码图片
+    let verifyImg = ref("");
 
     //是否显示
     let isAppear = ref(false);
@@ -121,6 +175,8 @@ export default {
       b: 0,
     });
 
+    let verifyText = ref("发送验证码");
+
     let currentBgColor = computed(() => {
       return `rgb(${color.r},${color.g},${color.b})`;
     });
@@ -128,7 +184,6 @@ export default {
       return `rgb(${255 - color.r},${255 - color.g},${255 - color.b})`;
     });
     let currentRegister = computed(() => {
-      console.log(isRegister);
       return isRegister.value ? `0%` : `-100%`;
     });
 
@@ -212,22 +267,56 @@ export default {
     //鼠标退出可以触发退出动画
     function openOutControl() {
       outControl.value = true;
-      console.log(666);
     }
 
     //鼠标退出不可以触发退出动画
     function closeOutControl() {
       outControl.value = false;
-      console.log(777);
     }
 
+    //转向注册页面
     function gotoRegister() {
       isRegister.value = true;
     }
 
+    //转向登录页面
     function gotoLogin() {
       isRegister.value = false;
     }
+
+    function startChat() {
+      login.checkLogin(loginInfo).then((res) => {
+        console.log(res);
+        router.push({
+          name: "main",
+          query: {
+            photo: res.photo,
+          },
+        });
+      });
+    }
+
+    function getEmailCode() {
+      login.getEmailCode(registerInfo.email);
+    }
+
+    function startRegister() {
+      login.startRegister(registerInfo);
+    }
+
+    function getVerifyImg() {
+      login.getVerifyImg().then((res) => {
+        verifyImg.value = `data:image/webp;base64,${res.data}`;
+      });
+    }
+
+    onMounted(() => {
+      getVerifyImg();
+      // login.checkLogin(loginInfo).then((res) => {
+      //   console.log(res);
+      // });
+    });
+
     return {
       isIn,
       isOut,
@@ -239,10 +328,18 @@ export default {
       currentRegister,
       fontColor,
       position,
+      loginInfo,
+      registerInfo,
+      verifyImg,
+      verifyText,
+      startChat,
+      getVerifyImg,
       mouseIn,
       mouseOut,
       gotoLogin,
       gotoRegister,
+      getEmailCode,
+      startRegister,
       openOutControl,
       closeOutControl,
     };
@@ -257,6 +354,25 @@ export default {
   text-decoration: none;
   list-style: none;
   box-sizing: border-box;
+}
+.verify {
+  width: 100px;
+  height: 30px;
+}
+
+.verify-box {
+  display: flex;
+}
+
+.sendVerify {
+  width: 100px;
+  height: 50px;
+  border: none;
+  color: #409eff;
+  background-color: transparent;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
 }
 
 .login {
@@ -319,7 +435,7 @@ source {
 
 .container form {
   width: 400px;
-  height: 200px;
+  height: 60%;
   display: flex;
   justify-content: space-around;
   flex-direction: column;

@@ -7,4 +7,12 @@ server:
 
 spring:
   profiles:
-    active: xcc
+    active: fengyang
+    jackson:
+      # json 序列化排除值为 null 的属性
+      default-property-inclusion: non_null
+
+
+mybatis:
+  mapper-locations: classpath*:guy/mapper/*.xml
+  type-aliases-package: tyut.homework.webchat
