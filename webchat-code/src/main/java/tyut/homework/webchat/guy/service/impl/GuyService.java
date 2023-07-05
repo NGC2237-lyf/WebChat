@@ -31,20 +31,19 @@ public class GuyService implements IGuyService {
 
     @Override
     public boolean guyAdd(UserGuyDTO userGuy) {
+        guyMapper.guyAdd(new UserGuyDTO(userGuy.getMyId(), userGuy.getMyId()));
         if (isContainGuy(userGuy)) {
-            return false;
+            return true;
         }
         guyMapper.guyAdd(userGuy);
-        UserGuyDTO guyUser = new UserGuyDTO();
-        guyUser.setGuyId(userGuy.getMyId());
-        guyUser.setMyId(userGuy.getGuyId());
-        guyMapper.guyAdd(guyUser);
-        return true;
+        guyMapper.guyAdd(new UserGuyDTO(userGuy.getGuyId(),userGuy.getMyId()));
+        return false;
     }
 
     @Override
     public boolean guyDelete(int myId, int guyId) {
         guyMapper.guyDelete(myId, guyId);
+        guyMapper.guyDelete(guyId,myId);
         return true;
     }
 
@@ -63,6 +62,7 @@ public class GuyService implements IGuyService {
     public boolean isContainGuy(UserGuyDTO userGuy) {
         //查看好友列表是否还有已添加的成员
         //查看好友列表
+
         List<User> guys = guyMapper.guyList(userGuy.getMyId()).getGuys();
         //查看好友列表是否已经包含已搜索成员
         if (guys.contains(guyMapper.guyInfo(userGuy))) {
