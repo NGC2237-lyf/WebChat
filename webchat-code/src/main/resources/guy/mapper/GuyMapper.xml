@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="tyut.homework.webchat.guy.mapper.IGuyMapper">
 
-    <resultMap id="user" type="tyut.homework.webchat.guy.dto.UserGuy">
+    <resultMap id="user" type="tyut.homework.webchat.guy.dto.UserGuyDTO">
         <id property="myId" column="my_id"/>
         <id property="guyId" column="guy_id"/>
         <result property="remark" column="remark"/>
@@ -99,7 +99,7 @@
           and guy_id = #{guyId}
     </delete>
 
-    <insert id="guyAdd" parameterType="tyut.homework.webchat.guy.dto.UserGuy">
+    <insert id="guyAdd" parameterType="tyut.homework.webchat.guy.dto.UserGuyDTO">
         INSERT INTO friend(my_id, guy_id, remark)
         VALUES (#{userGuy.myId}, #{userGuy.guyId}, #{userGuy.remark})
     </insert>
@@ -111,5 +111,25 @@
           and guy_id = #{userGuy.guyId}
     </update>
 
+    <insert id="addMessage">
+        insert into message(my_id,to_id)
+        values (#{myId},#{toId})
+    </insert>
 
+    <select id="getMessage" resultMap="message">
+        select *
+        from message where my_id = #{myId} and to_id = #{toId};
+    </select>
+
+    <resultMap id="message" type="tyut.homework.webchat.guy.dto.MessageDTO">
+        <id property="myId" column="my_id"/>
+        <id property="toId" column="to_id"/>
+        <result property="flag" column="flag"/>
+    </resultMap>
+
+    <update id="updateMessage">
+        update message
+        set flag = #{flag}
+        where my_id = #{myId} and to_id = #{toId};
+    </update>
 </mapper>
