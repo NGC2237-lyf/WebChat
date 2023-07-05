@@ -28,17 +28,17 @@ public class ChatController {
     @Autowired
     private RedisUtil redisUtil;
 
-    @GetMapping("/history/{start}/{end}")
-    public List<Message> getHistory(@PathVariable("start") int start,@PathVariable("end") int end) {
-        Long count = redisUtil.listLen("history");
-        if (start + end > count) {
-            boolean result = historyService.getHistory(Integer.parseInt(String.valueOf(count)),end);
+    @GetMapping("/history/{userId}/{start}/{end}")
+    public List<Message> getHistory(@PathVariable("userId") String userId,@PathVariable("start") int start,@PathVariable("end") int end) {
+        Long userCount = ChatHandler.recordMap.get(userId);
+        if (start + end > userCount) {
+            boolean result = historyService.getHistory(Integer.parseInt(String.valueOf(userCount)),end);
             if (!result) {
                 return null;
             }
             return (List<Message>) redisUtil.listRange("history",0,end -1);
         } else {
-            return (List<Message>) redisUtil.listRange("history",start,start + end -1);
+            return (List<Message>) redisUtil.listRange("history",userCount -(start + end), userCount - start - 1);
         }
     }
 }
