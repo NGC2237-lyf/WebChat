@@ -13,6 +13,8 @@ public interface IGuyService {
     boolean guyAdd(UserGuy userGuy);
 
     boolean guyDelete(int myId, int guyId);
-    boolean guyRemarkUpdate(String remark,UserGuy userGuy);
+
+    boolean guyRemarkUpdate(String remark, UserGuy userGuy);
+
     User guyDetail(UserGuy userGuy);
 }

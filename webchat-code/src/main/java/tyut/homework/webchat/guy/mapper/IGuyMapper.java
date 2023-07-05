@@ -13,7 +13,7 @@ public interface IGuyMapper {
 
     User getUserByEmail(@Param("email")String email);
 
-    User findUserByEmail(@Param("email")String email);
+    User getUserById(@Param("id")String id);
 
     int insertDataByEmail(@Param("user")User user);
     /**
@@ -22,7 +22,7 @@ public interface IGuyMapper {
      * @param account
      * @return
      */
-    UserGuy guyList(@Param("id")int account);
+    UserGuy guyList(@Param("id") int account);
 
     /**
      * 搜索好友
@@ -62,4 +62,7 @@ public interface IGuyMapper {
      * @return
      */
     User guyInfo(@Param("userGuy") UserGuy userGuy);
+
+
+    List<User> addMessage(@Param("account") int account);
 }

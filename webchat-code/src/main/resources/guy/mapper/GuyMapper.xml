@@ -26,33 +26,27 @@
 
 
     <insert id="insertDataByEmail">
-        insert into `user` values (
-                                      #{user.nickName},#{user.email},#{user.password},#{user.photo}
-                                  );
+        insert into `user` (nick_name, password, email, photo)
+        values (#{user.nickName}, #{user.password}, #{user.email}, #{user.photo});
     </insert>
 
 
-    <select id="getUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
+    <select id="getUserByEmail" resultType="tyut.homework.webchat.common.domain.User" resultMap="userSearch">
         select *
         FROM `user`
         WHERE email = #{email};
     </select>
 
-    <select id="findUserByEmail" resultType="tyut.homework.webchat.common.domain.User">
-        select *
-        FROM `user`
-        WHERE email = #{email};
-    </select>
 
     <select id="guyList" resultMap="user" parameterType="int">
         SELECT friend.my_id, friend.remark, `user`.id, `user`.nick_name, `user`.email, `user`.photo
         FROM `user`
-        INNER JOIN friend
-        ON `user`.id = friend.guy_id
+                 INNER JOIN friend
+                            ON `user`.id = friend.guy_id
         WHERE (friend.my_id, friend.guy_id) IN (SELECT friend.my_id, friend.guy_id
                                                 FROM friend
-                                                INNER JOIN `user`
-                                                ON friend.my_id = `user`.id
+                                                         INNER JOIN `user`
+                                                                    ON friend.my_id = `user`.id
                                                 WHERE `user`.id = #{id})
     </select>
 
@@ -62,7 +56,7 @@
         <where>
             <choose>
                 <when test="user.id != null and user.id != '' ">
-                id = #{user.id}
+                    id = #{user.id}
                 </when>
                 <when test="user.nickName != null and user.nickName != '' ">
                     binary nick_name like concat('%',#{user.nickName},'%')
@@ -76,32 +70,46 @@
             </choose>
         </where>
     </select>
-    
+
     <select id="guyInfo" resultMap="userSearch">
-        SELECT `user`.id ,friend.remark,`user`.nick_name,`user`.email,`user`.photo
-        FROM  `user`
-                  INNER JOIN friend
-                             ON `user`.id = friend.guy_id
-        WHERE friend.my_id = #{userGuy.myId} AND (`user`.id) IN (SELECT friend.guy_id
-                                                   FROM friend
-                                                            INNER JOIN `user`
-                                                                       ON friend.my_id = `user`.id
-                                                   WHERE `user`.id = #{userGuy.myId} ) AND friend.guy_id = #{userGuy.guyId}
+        SELECT `user`.id, friend.remark, `user`.nick_name, `user`.email, `user`.photo
+        FROM `user`
+                 INNER JOIN friend
+                            ON `user`.id = friend.guy_id
+        WHERE friend.my_id = #{userGuy.myId}
+          AND (`user`.id) IN (SELECT friend.guy_id
+                              FROM friend
+                                       INNER JOIN `user`
+                                                  ON friend.my_id = `user`.id
+                              WHERE `user`.id = #{userGuy.myId})
+          AND friend.guy_id = #{userGuy.guyId}
 
     </select>
+
+    <select id="getUserById" resultType="tyut.homework.webchat.common.domain.User">
+        select *
+        FROM `user`
+        WHERE id = #{id};
+    </select>
+
     <delete id="guyDelete">
-        DELETE FROM friend WHERE my_id = #{myId} and guy_id = #{guyId}
+        DELETE
+        FROM friend
+        WHERE my_id = #{myId}
+          and guy_id = #{guyId}
     </delete>
 
     <insert id="guyAdd" parameterType="tyut.homework.webchat.guy.dto.UserGuy">
-        INSERT INTO friend(my_id,guy_id,remark)
-        VALUES (#{userGuy.myId},#{userGuy.guyId},#{userGuy.remark})
+        INSERT INTO friend(my_id, guy_id, remark)
+        VALUES (#{userGuy.myId}, #{userGuy.guyId}, #{userGuy.remark})
     </insert>
 
     <update id="guyRemarkUpdate">
         update friend
         set remark = #{remark}
-        where my_id = #{userGuy.myId} and guy_id = #{userGuy.guyId}
+        where my_id = #{userGuy.myId}
+          and guy_id = #{userGuy.guyId}
     </update>
-    
+
+
 </mapper>

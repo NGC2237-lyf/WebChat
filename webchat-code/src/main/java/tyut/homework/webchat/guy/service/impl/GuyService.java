@@ -23,7 +23,6 @@ public class GuyService implements IGuyService {
     public List<User> guySearch(User user) {
         List<User> users = guyMapper.guySearch(user);
         if (users.isEmpty()) {
-            System.err.println("用户不存在");
             return null;
         }
         return users;
@@ -35,6 +34,10 @@ public class GuyService implements IGuyService {
             return false;
         }
         guyMapper.guyAdd(userGuy);
+        UserGuy guyUser = new UserGuy();
+        guyUser.setGuyId(userGuy.getMyId());
+        guyUser.setMyId(userGuy.getGuyId());
+        guyMapper.guyAdd(guyUser);
         return true;
     }
 
@@ -55,6 +58,7 @@ public class GuyService implements IGuyService {
         return guyMapper.guyInfo(userGuy);
     }
 
+
     public boolean isContainGuy(UserGuy userGuy) {
         //查看好友列表是否还有已添加的成员
         //查看好友列表
@@ -67,7 +71,7 @@ public class GuyService implements IGuyService {
         return false;
     }
 
-    public boolean addYourself(int id){
+    public boolean addYourself(int id) {
         UserGuy userGuy = new UserGuy();
         userGuy.setMyId(id);
         userGuy.setGuyId(id);
