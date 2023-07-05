@@ -1,11 +1,13 @@
 package tyut.homework.webchat.information.websocket.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
+import tyut.homework.webchat.common.domain.User;
+import tyut.homework.webchat.guy.mapper.IGuyMapper;
 import tyut.homework.webchat.information.entity.DataType;
 import tyut.homework.webchat.information.entity.Message;
 import tyut.homework.webchat.information.entity.MessageType;
@@ -14,11 +16,13 @@ import tyut.homework.webchat.information.utils.DateUtil;
 import tyut.homework.webchat.information.utils.FileUtil;
 import tyut.homework.webchat.information.utils.RedisUtil;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 /**
  * @author TokisakiKurumi
@@ -30,18 +34,26 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 public class ChatHandler implements WebSocketHandler {
 
+    public static Long count = 0L;
+
     @Autowired
     private RedisUtil redisUtil;
 
+    @Autowired
+    private IGuyMapper guyMapper;
+
     private static final ConcurrentMap<String, WebSocketSession> SESSION_POOL = new ConcurrentHashMap<>();
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(20,50,0L, TimeUnit.SECONDS,new LinkedBlockingDeque<>());
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String userId = getUserId(session);
         log.info("userId: " + userId + " 建立连接");
         SESSION_POOL.put(userId, session);
-        sendBroadcastMessage(new Message(MessageType.BROADCAST,null,null,DataType.JOIN,null,null,DateUtil.getNow()),userId);
+        sendJoinMessage(userId);
     }
 
     @Override
@@ -82,9 +94,7 @@ public class ChatHandler implements WebSocketHandler {
         return false;
     }
 
-    public Set<String> getPopulation() {
-        return SESSION_POOL.keySet();
-    }
+
 
     public String getUserId(WebSocketSession session) {
         return (String) session.getAttributes().get("userId");
@@ -116,6 +126,8 @@ public class ChatHandler implements WebSocketHandler {
     }
 
     public boolean sendBroadcastMessage(Message userMessage, String userId) {
+        poolExecutor.execute(() -> {});
+        count++;
         boolean flag = false;
         if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
             for (WebSocketSession sessions : SESSION_POOL.values()) {
@@ -132,7 +144,8 @@ public class ChatHandler implements WebSocketHandler {
                 String fileName = "file/" + userId+ "-" + DateUtil.getMillis() + "-" + userMessage.getFileName();
                 FileUtil.touchFile(fileName,userMessage.getInfo());
                 userMessage.setInfo(fileName);
-                redisUtil.listRightPush(userId+"-chat",userMessage);
+                redisUtil.listRightPush("chat",userMessage);
+                redisUtil.listRightPush("history",userMessage);
             }
             return flag;
         } else {
@@ -147,7 +160,8 @@ public class ChatHandler implements WebSocketHandler {
                 }
             }
             if (flag) {
-                redisUtil.listRightPush(userId+"-chat",userMessage);
+                redisUtil.listRightPush("chat",userMessage);
+                redisUtil.listRightPush("history",userMessage);
             }
         }
         return flag;
@@ -155,11 +169,47 @@ public class ChatHandler implements WebSocketHandler {
 
     public void sendErrorMessage(WebSocketSession session) throws IOException {
         session.sendMessage(new TextMessage(objectMapper
-                .writeValueAsString(new ServerMessage(MessageType.SINGLE,DataType.Error,"发送消息失败"))));
+                .writeValueAsString(new ServerMessage(MessageType.SINGLE,DataType.ERROR,"发送消息失败"))));
     }
 
-    public void sendJoinMessage(WebSocketSession session,String userId) throws IOException {
-        session.sendMessage(new TextMessage(objectMapper
-                .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.JOIN,userId + "已上线"))));
+    public void sendJoinMessage(String userId) throws IOException {
+        User user = new User();
+        user.setId(Integer.parseInt(userId));
+        for (WebSocketSession session : SESSION_POOL.values()) {
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(objectMapper
+                        .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.JOIN,guyMapper.guySearch(user).get(0).getNickName() + " 已上线"))));
+            }
+        }
+    }
+
+    @PostConstruct
+    public void sendSessionMessage() {
+        poolExecutor.execute(() -> {
+            int count = SESSION_POOL.size();
+            while (true) {
+                if (!Objects.equals(SESSION_POOL.size(),count)) {
+                    count = SESSION_POOL.size();
+                    Set<String> idSet = SESSION_POOL.keySet();
+                    User user = new User();
+                    List<User> userList = new ArrayList<>();
+                    for (String s : idSet) {
+                        user.setId(Integer.parseInt(s));
+                        userList.add(guyMapper.guySearch(user).get(0));
+                    }
+                    for (WebSocketSession session : SESSION_POOL.values()) {
+                        if (session.isOpen()) {
+                            try {
+                                session.sendMessage(new TextMessage(objectMapper
+                                        .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.UPDATE, objectMapper.writeValueAsString(userList)))));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
     }
 }

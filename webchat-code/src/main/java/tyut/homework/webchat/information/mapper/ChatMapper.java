@@ -17,5 +17,5 @@ public interface ChatMapper {
 
     void insertRecord(@Param("message") Message message);
 
-    List<Object> getRecord(@Param("num") int num);
+    List<Object> getRecord(@Param("start") int start, @Param("end") int end);
 }

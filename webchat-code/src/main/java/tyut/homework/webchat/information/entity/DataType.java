@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public enum DataType {
     //消息类型
-    TEXT("text"),FILE("file"),JOIN("join"),Error("error");
+    TEXT("text"), FILE("file"), JOIN("join"), ERROR("error"), UPDATE("update");
 
     private String description;
 
@@ -38,7 +38,7 @@ public enum DataType {
                 return type;
             }
         }
-        throw  new IllegalArgumentException("Invalid dataType value: " + value);
+        throw new IllegalArgumentException("Invalid dataType value: " + value);
     }
 
     @JsonValue

@@ -14,5 +14,6 @@ spring:
 
 
 mybatis:
-  mapper-locations: classpath*:guy/mapper/*.xml
+  mapper-locations: classpath*:guy/mapper/*.xml,mapper/*.xml
   type-aliases-package: tyut.homework.webchat
+  config-location: classpath:mybatis/mybatis-config.xml
