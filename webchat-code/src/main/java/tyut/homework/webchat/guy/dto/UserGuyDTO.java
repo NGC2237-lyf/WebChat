@@ -1,5 +1,6 @@
 package tyut.homework.webchat.guy.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import tyut.homework.webchat.common.domain.User;

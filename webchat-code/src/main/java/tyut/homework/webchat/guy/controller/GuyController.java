@@ -25,17 +25,17 @@ public class GuyController {
 
     @PostMapping("/list/{account}")
     public Result guyList(@PathVariable("account") int account) {
+        if (guyService.guyList(account) == null) {
+            return Result.error("好友列表为空");
+        }
         return Result.success(guyService.guyList(account));
     }
 
     @PostMapping("/search")
     public Result guySearch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ServletInputStream requestInputStream = request.getInputStream();
-        //将字节流转换为字符流,并设置字符编码为utf-8
         InputStreamReader ir = new InputStreamReader(requestInputStream, "utf-8");
-        //使用字符缓冲流进行读取
         BufferedReader br = new BufferedReader(ir);
-        //开始拼装json字符串
         String line = null;
         StringBuilder sb = new StringBuilder();
         while ((line = br.readLine()) != null) {
@@ -56,15 +56,15 @@ public class GuyController {
     }
 
     @PostMapping("/delete")
-    public Result guyDelete(@RequestParam("myId") int myId, @RequestParam("guyId") int guyId) {
-        guyService.guyDelete(myId, guyId);
+    public Result guyDelete(@RequestBody UserGuyDTO userGuyDTO) {
+        guyService.guyDelete(userGuyDTO.getMyId(), userGuyDTO.getGuyId());
         return Result.success("删除好友成功");
     }
 
     @PostMapping("/add")
     public Result guyAdd(@RequestBody UserGuyDTO userGuy) {
         if (guyService.guyAdd(userGuy)) {
-            Result.error("该好友已经存在您的好友列表");
+            return Result.error("该好友已经存在您的好友列表");
         }
         return Result.success("好友添加成功");
     }
