@@ -17,7 +17,13 @@ public class GuyService implements IGuyService {
 
     @Override
     public UserGuyDTO guyList(int account) {
-        return guyMapper.guyList(account);
+        UserGuyDTO userGuyDTO = guyMapper.guyList(account);
+        try {
+            List<User> guys = userGuyDTO.getGuys();
+        }catch (NullPointerException e){
+            return null;
+        }
+        return userGuyDTO;
     }
 
     @Override
@@ -31,20 +37,27 @@ public class GuyService implements IGuyService {
 
     @Override
     public boolean guyAdd(UserGuyDTO userGuy) {
+        try {
+            List<User> guys = guyList(userGuy.getMyId()).getGuys();
+        } catch (NullPointerException e) {
+            guyMapper.guyAdd(new UserGuyDTO(userGuy.getMyId(), userGuy.getMyId()));
+        }
         if (isContainGuy(userGuy)) {
-            return false;
+            return true;
         }
         guyMapper.guyAdd(userGuy);
-        UserGuyDTO guyUser = new UserGuyDTO();
-        guyUser.setGuyId(userGuy.getMyId());
-        guyUser.setMyId(userGuy.getGuyId());
-        guyMapper.guyAdd(guyUser);
-        return true;
+        guyMapper.guyAdd(new UserGuyDTO(userGuy.getGuyId(), userGuy.getMyId()));
+        return false;
     }
 
     @Override
     public boolean guyDelete(int myId, int guyId) {
         guyMapper.guyDelete(myId, guyId);
+        guyMapper.guyDelete(guyId, myId);
+        List<User> guys = guyMapper.guyList(myId).getGuys();
+        if (guys.size() == 1 && guys.get(0).getId() == myId) {
+            guyMapper.guyDelete(myId, myId);
+        }
         return true;
     }
 
@@ -63,6 +76,7 @@ public class GuyService implements IGuyService {
     public boolean isContainGuy(UserGuyDTO userGuy) {
         //查看好友列表是否还有已添加的成员
         //查看好友列表
+
         List<User> guys = guyMapper.guyList(userGuy.getMyId()).getGuys();
         //查看好友列表是否已经包含已搜索成员
         if (guys.contains(guyMapper.guyInfo(userGuy))) {
@@ -80,14 +94,14 @@ public class GuyService implements IGuyService {
         return true;
     }
 
-    public Result sendGuyRequest(int myId,int toId){
+    public Result sendGuyRequest(int myId, int toId) {
         UserGuyDTO userGuyDTO = new UserGuyDTO(myId, toId);
         if (isContainGuy(userGuyDTO)) {
             return Result.error("该好友已经存在您的好友列表");
         }
-        if(this.guyMapper.getMessage(myId, toId) != null){
+        if (this.guyMapper.getMessage(myId, toId) != null) {
             String flag = guyMapper.getMessage(myId, toId).getFlag();
-            if(flag.equals("")){
+            if (flag.equals("")) {
                 flag = "尚未同意";
             }
             return Result.success("好友申请已存在，对方" + flag);
@@ -98,14 +112,14 @@ public class GuyService implements IGuyService {
         return Result.success("发送成功");
     }
 
-    public Result sendGuyResultInfo(int myId,int toId,String msg){
-        if(guyMapper.getMessage(myId, toId) == null){
+    public Result sendGuyResultInfo(int myId, int toId, String msg) {
+        if (guyMapper.getMessage(myId, toId) == null) {
             return Result.error("改好友请求不存在");
         }
         guyMapper.updateMessage(myId, toId, msg);
 
-        guyMapper.guyAdd(new UserGuyDTO(myId,toId));
-        guyMapper.guyAdd(new UserGuyDTO(toId,myId));
+        guyMapper.guyAdd(new UserGuyDTO(myId, toId));
+        guyMapper.guyAdd(new UserGuyDTO(toId, myId));
         return Result.success("添加好友成功");
     }
 }
