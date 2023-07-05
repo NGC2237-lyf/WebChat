@@ -18,10 +18,7 @@ import tyut.homework.webchat.information.utils.RedisUtil;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -44,6 +41,8 @@ public class ChatHandler implements WebSocketHandler {
 
     private static final ConcurrentMap<String, WebSocketSession> SESSION_POOL = new ConcurrentHashMap<>();
 
+    public static final HashMap<String,Long> recordMap = new HashMap<>();
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(20,50,0L, TimeUnit.SECONDS,new LinkedBlockingDeque<>());
@@ -51,6 +50,7 @@ public class ChatHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String userId = getUserId(session);
+        recordMap.put(userId, redisUtil.listLen("history"));
         log.info("userId: " + userId + " 建立连接");
         SESSION_POOL.put(userId, session);
         sendJoinMessage(userId);
@@ -127,7 +127,6 @@ public class ChatHandler implements WebSocketHandler {
 
     public boolean sendBroadcastMessage(Message userMessage, String userId) {
         poolExecutor.execute(() -> {});
-        count++;
         boolean flag = false;
         if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
             for (WebSocketSession sessions : SESSION_POOL.values()) {
