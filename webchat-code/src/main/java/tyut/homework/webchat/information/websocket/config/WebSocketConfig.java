@@ -10,7 +10,7 @@ import tyut.homework.webchat.information.websocket.interceptor.WebSocketIntercep
 
 /**
  * @author TokisakiKurumi
- * @className WebSocketConfig
+ * @className WebSocketConfigStart
  * @date 2023/6/27
  * @description
  **/
@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatHandler,"/chat")
+        registry.addHandler(chatHandler, "/chat")
                 .addInterceptors(new WebSocketInterceptor())
                 .setAllowedOrigins("*");
     }

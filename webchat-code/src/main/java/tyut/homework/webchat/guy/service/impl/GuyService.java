@@ -3,7 +3,8 @@ package tyut.homework.webchat.guy.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tyut.homework.webchat.common.domain.User;
-import tyut.homework.webchat.guy.dto.UserGuy;
+import tyut.homework.webchat.common.utils.Result;
+import tyut.homework.webchat.guy.dto.UserGuyDTO;
 import tyut.homework.webchat.guy.mapper.IGuyMapper;
 import tyut.homework.webchat.guy.service.IGuyService;
 
@@ -15,7 +16,7 @@ public class GuyService implements IGuyService {
     IGuyMapper guyMapper;
 
     @Override
-    public UserGuy guyList(int account) {
+    public UserGuyDTO guyList(int account) {
         return guyMapper.guyList(account);
     }
 
@@ -29,12 +30,12 @@ public class GuyService implements IGuyService {
     }
 
     @Override
-    public boolean guyAdd(UserGuy userGuy) {
+    public boolean guyAdd(UserGuyDTO userGuy) {
         if (isContainGuy(userGuy)) {
             return false;
         }
         guyMapper.guyAdd(userGuy);
-        UserGuy guyUser = new UserGuy();
+        UserGuyDTO guyUser = new UserGuyDTO();
         guyUser.setGuyId(userGuy.getMyId());
         guyUser.setMyId(userGuy.getGuyId());
         guyMapper.guyAdd(guyUser);
@@ -48,18 +49,18 @@ public class GuyService implements IGuyService {
     }
 
     @Override
-    public boolean guyRemarkUpdate(String remark, UserGuy userGuy) {
+    public boolean guyRemarkUpdate(String remark, UserGuyDTO userGuy) {
         guyMapper.guyRemarkUpdate(remark, userGuy);
         return true;
     }
 
     @Override
-    public User guyDetail(UserGuy userGuy) {
+    public User guyDetail(UserGuyDTO userGuy) {
         return guyMapper.guyInfo(userGuy);
     }
 
 
-    public boolean isContainGuy(UserGuy userGuy) {
+    public boolean isContainGuy(UserGuyDTO userGuy) {
         //查看好友列表是否还有已添加的成员
         //查看好友列表
         List<User> guys = guyMapper.guyList(userGuy.getMyId()).getGuys();
@@ -72,10 +73,39 @@ public class GuyService implements IGuyService {
     }
 
     public boolean addYourself(int id) {
-        UserGuy userGuy = new UserGuy();
+        UserGuyDTO userGuy = new UserGuyDTO();
         userGuy.setMyId(id);
         userGuy.setGuyId(id);
         guyMapper.guyAdd(userGuy);
         return true;
+    }
+
+    public Result sendGuyRequest(int myId,int toId){
+        UserGuyDTO userGuyDTO = new UserGuyDTO(myId, toId);
+        if (isContainGuy(userGuyDTO)) {
+            return Result.error("该好友已经存在您的好友列表");
+        }
+        if(this.guyMapper.getMessage(myId, toId) != null){
+            String flag = guyMapper.getMessage(myId, toId).getFlag();
+            if(flag.equals("")){
+                flag = "尚未同意";
+            }
+            return Result.success("好友申请已存在，对方" + flag);
+        }
+
+        guyMapper.addMessage(myId, toId);
+
+        return Result.success("发送成功");
+    }
+
+    public Result sendGuyResultInfo(int myId,int toId,String msg){
+        if(guyMapper.getMessage(myId, toId) == null){
+            return Result.error("改好友请求不存在");
+        }
+        guyMapper.updateMessage(myId, toId, msg);
+
+        guyMapper.guyAdd(new UserGuyDTO(myId,toId));
+        guyMapper.guyAdd(new UserGuyDTO(toId,myId));
+        return Result.success("添加好友成功");
     }
 }
