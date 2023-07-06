@@ -1,6 +1,6 @@
 <template>
   <div class="person" :style="{ right: currentRight }">
-    <p>在线人数</p>
+    <p>在线</p>
     <div class="persons">
       <div v-for="item in store.state.onlinePeople">
         <img :src="item.photo" />
@@ -31,7 +31,7 @@ export default {
 <style scoped>
 .person {
   width: 300px;
-  position: sticky;
+  position: absolute;
   transition: all 1s;
   top: 0;
   padding: 5px 10px;

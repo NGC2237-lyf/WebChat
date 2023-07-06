@@ -291,6 +291,7 @@ export default {
       login.checkLogin(loginInfo).then((res) => {
         if (res.code === 200) {
           let data = res.data;
+          store.state.currentChat.id = data.id;
           store.state.info.id = data.id;
           store.state.info.name = data.nickName;
           store.state.info.photo = `data:image/webp;base64,${data.photo}`;

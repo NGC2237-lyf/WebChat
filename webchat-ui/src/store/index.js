@@ -20,12 +20,15 @@ export default createStore({
             photo: ""
         },
         friends: [],
-        currentChat: "聊天室",
+        currentChat: { name: "聊天室", id: 0 },
         messages: [],
+        chatRoom: [],
+        private: {
+
+        },
         onlinePerson: 0,
         onlinePeople: [],
-        inflinePeople: []
-
+        inflinePeople: [],
     },
     mutations: {
 

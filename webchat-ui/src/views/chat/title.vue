@@ -1,6 +1,11 @@
 <template>
   <div class="title">
-    <p>{{ store.state.currentChat }}({{ store.state.onlinePerson }})</p>
+    <p>
+      {{ store.state.currentChat.name
+      }}<span v-if="store.state.currentChat.name === '聊天室'"
+        >({{ store.state.onlinePerson }})</span
+      >
+    </p>
     <svg
       t="1688605385641"
       class="icon"
