@@ -11,11 +11,28 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 29/06/2023 10:32:17
+ Date: 05/07/2023 11:32:40
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for chat_record
+-- ----------------------------
+DROP TABLE IF EXISTS `chat_record`;
+CREATE TABLE `chat_record`  (
+  `user_id` varchar(15) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `opposite_user` varchar(15) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `message_type` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `data_type` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `info` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `date_time` timestamp NOT NULL
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of chat_record
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for friend
@@ -26,7 +43,7 @@ CREATE TABLE `friend`  (
   `guy_id` int NOT NULL COMMENT '好友id',
   `remark` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`my_id`, `guy_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of friend
@@ -43,6 +60,22 @@ INSERT INTO `friend` VALUES (10, 1, 'Gopj9ZihTO');
 INSERT INTO `friend` VALUES (10, 9, 'DXZlUzDmGV');
 
 -- ----------------------------
+-- Table structure for message
+-- ----------------------------
+DROP TABLE IF EXISTS `message`;
+CREATE TABLE `message`  (
+  `my_id` int NOT NULL COMMENT '用户账号',
+  `to_id` int NOT NULL COMMENT '发送好友的账号',
+  `flag` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '消息状态',
+  PRIMARY KEY (`my_id`, `to_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of message
+-- ----------------------------
+INSERT INTO `message` VALUES (1, 5, '同意');
+
+-- ----------------------------
 -- Table structure for user
 -- ----------------------------
 DROP TABLE IF EXISTS `user`;
@@ -53,7 +86,7 @@ CREATE TABLE `user`  (
   `email` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '邮箱',
   `photo` longblob NULL COMMENT '头像',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user

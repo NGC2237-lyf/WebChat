@@ -3,7 +3,8 @@ package tyut.homework.webchat.guy.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import tyut.homework.webchat.common.domain.User;
-import tyut.homework.webchat.guy.dto.UserGuy;
+import tyut.homework.webchat.guy.dto.MessageDTO;
+import tyut.homework.webchat.guy.dto.UserGuyDTO;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface IGuyMapper {
      * @param account
      * @return
      */
-    UserGuy guyList(@Param("id")int account);
+    UserGuyDTO guyList(@Param("id") int account);
 
     /**
      * 搜索好友
@@ -45,7 +46,7 @@ public interface IGuyMapper {
      *
      * @param userGuy
      */
-    void guyAdd(@Param("userGuy") UserGuy userGuy);
+    void guyAdd(@Param("userGuy") UserGuyDTO userGuy);
 
     /**
      * 修改好友昵称
@@ -53,7 +54,7 @@ public interface IGuyMapper {
      * @param remark
      * @param userGuy
      */
-    void guyRemarkUpdate(@Param("remark") String remark, @Param("userGuy") UserGuy userGuy);
+    void guyRemarkUpdate(@Param("remark") String remark, @Param("userGuy") UserGuyDTO userGuy);
 
     /**
      * 查询好友信息
@@ -61,5 +62,12 @@ public interface IGuyMapper {
      * @param userGuy
      * @return
      */
-    User guyInfo(@Param("userGuy") UserGuy userGuy);
+    User guyInfo(@Param("userGuy") UserGuyDTO userGuy);
+
+
+    void addMessage(@Param("myId") int myId,@Param("toId")int toId);
+
+    MessageDTO getMessage(@Param("myId") int myId,@Param("toId")int toId);
+
+    void updateMessage(@Param("myId") int myId,@Param("toId")int toId,@Param("flag")String flag);
 }

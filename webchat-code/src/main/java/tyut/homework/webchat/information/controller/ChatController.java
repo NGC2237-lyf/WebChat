@@ -8,7 +8,6 @@ import tyut.homework.webchat.information.utils.RedisUtil;
 import tyut.homework.webchat.information.websocket.handler.ChatHandler;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author TokisakiKurumi
@@ -29,17 +28,17 @@ public class ChatController {
     @Autowired
     private RedisUtil redisUtil;
 
-    @GetMapping("/population")
-    public Set<String> getPopulation() {
-        return chatHandler.getPopulation();
-    }
-
-    @PostMapping("/history/{num}")
-    public List<Message> getHistory(@PathVariable("num") int num) {
-        boolean result = historyService.getHistory(num);
-        if (result) {
-            return (List<Message>) redisUtil.listRange("history",0,redisUtil.listLen("history"));
+    @GetMapping("/history/{userId}/{start}/{end}")
+    public List<Message> getHistory(@PathVariable("userId") String userId,@PathVariable("start") int start,@PathVariable("end") int end) {
+        Long userCount = ChatHandler.recordMap.get(userId);
+        if (start + end > userCount) {
+            boolean result = historyService.getHistory(Integer.parseInt(String.valueOf(userCount)),end);
+            if (!result) {
+                return null;
+            }
+            return (List<Message>) redisUtil.listRange("history",0,end -1);
+        } else {
+            return (List<Message>) redisUtil.listRange("history",userCount -(start + end), userCount - start - 1);
         }
-        return null;
     }
 }
