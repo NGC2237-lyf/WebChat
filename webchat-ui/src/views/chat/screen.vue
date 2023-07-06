@@ -1,13 +1,24 @@
 <template>
-  <div class="screen">
+  <div class="screen-box">
     <person></person>
-    <p @click="getChatHistory" class="history">查看历史记录</p>
-    <Message
-      v-for="item in messages"
-      :text="item.info"
-      :isMY="store.state.info.id == item.userId"
-      :id="item.userId"
-    />
+    <div class="screen">
+      <p
+        @click="getChatHistory"
+        class="history"
+        v-if="store.state.currentChat.name === '聊天室'"
+      >
+        查看历史记录
+      </p>
+      <component
+        :is="item.dataType === 'text' ? 'Message' : 'FileMessage'"
+        v-for="item in store.state.messages"
+        :text="item.info"
+        :fileName="item.fileName"
+        :fileType="item.fileType"
+        :isMY="store.state.info.id == item.userId"
+        :id="item.userId"
+      />
+    </div>
   </div>
 </template>
 
@@ -17,15 +28,16 @@ import getHistory from "@/api/chat/index.js";
 import Message from "./message.vue";
 import { ref, reactive, onMounted, computed } from "vue";
 import Person from "./person.vue";
+import FileMessage from "./fileMessage.vue";
 export default {
   name: "screen",
   components: {
     Message,
     Person,
+    FileMessage,
   },
   setup() {
     let store = useStore();
-    let messages = store.state.messages;
     let start = ref(0);
     let step = ref(10);
     function getWords() {}
@@ -45,7 +57,6 @@ export default {
     });
     return {
       store,
-      messages,
       getWords,
       getChatHistory,
       generateWords,
@@ -55,10 +66,21 @@ export default {
 </script>
 
 <style>
-.screen {
+.screen-box {
+  position: relative;
   width: 100%;
   height: 500px;
   height: 65%;
+  padding-left: 1%;
+  margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+.screen {
+  width: 98%;
+  height: 500px;
+  height: 100%;
   padding-left: 1%;
   margin: 0 auto;
   overflow-y: auto;

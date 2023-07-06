@@ -34,16 +34,20 @@ export default {
           alert(res.msg);
           if (res.code === 200) {
             friend.getFriendsList(store.state.info.id).then((res) => {
-              let data = res.data;
-              let guys = data.guys.filter((item) => {
-                return item.id !== store.state.info.id;
-              });
-              store.state.friends = [];
-              store.state.friends.splice(
-                store.state.friends.length,
-                0,
-                ...guys
-              );
+              if (res.data !== null) {
+                let data = res.data;
+                let guys = data.guys.filter((item) => {
+                  item.photo = `data:image/png;base64,${item.photo}`;
+                  return item.id !== store.state.info.id;
+                });
+                // store.state.friends=
+                store.state.friends = [];
+                store.state.friends.splice(
+                  store.state.friends.length,
+                  0,
+                  ...guys
+                );
+              }
             });
           }
         });

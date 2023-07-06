@@ -50,6 +50,9 @@ export default {
             name.value = info.nickName;
           }
         });
+      } else {
+        avatar.value = info.photo;
+        name.value = info.nickName;
       }
     }
 

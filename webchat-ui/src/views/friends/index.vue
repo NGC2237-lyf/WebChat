@@ -31,9 +31,13 @@ export default {
             item.photo = `data:image/png;base64,${item.photo}`;
             return item.id !== store.state.info.id;
           });
+
           store.state.friends = [];
-          console.log(guys);
           store.state.friends.splice(store.state.friends.length, 0, ...guys);
+          //建立消息盒子
+          store.state.friends.map((item) => {
+            store.state.private[item.id] = [];
+          });
         }
       });
     });

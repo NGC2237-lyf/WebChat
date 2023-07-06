@@ -18,6 +18,7 @@
           p-id="2306"
         ></path>
       </svg>
+      <input type="file" id="upload" />
       <svg
         t="1687933319674"
         class="icon"
@@ -27,6 +28,7 @@
         p-id="3320"
         width="20"
         height="20"
+        @click="uploadFile"
       >
         <path
           d="M912 208H427.872l-50.368-94.176A63.936 63.936 0 0 0 321.056 80H112c-35.296 0-64 28.704-64 64v736c0 35.296 28.704 64 64 64h800c35.296 0 64-28.704 64-64v-608c0-35.296-28.704-64-64-64z m-800-64h209.056l68.448 128H912v97.984c-0.416 0-0.8-0.128-1.216-0.128H113.248c-0.416 0-0.8 0.128-1.248 0.128V144z m0 736v-96l1.248-350.144 798.752 1.216V784h0.064v96H112z"
@@ -60,22 +62,27 @@ export default {
     let ws = wsInstance.init();
     ws.onmessage = function (MessageEvent) {
       let data = JSON.parse(MessageEvent.data);
-      // console.log(MessageEvent.data);
-      // console.log(data.messageType === "broadcast" && data.dataType === "text");
-      if (data.messageType === "broadcast" && data.dataType === "text") {
-        store.state.messages.splice(store.state.messages.length, 0, data);
-      } else if (
-        data.messageType === "broadcast" &&
-        data.dataType === "update"
-      ) {
-        let info = JSON.parse(data.info);
-        store.state.onlinePeople = info.map((item) => {
-          item.photo = `data:image/png;base64,${item.photo}`;
-          return item;
-        });
-        store.state.onlinePerson = info.length;
+      if (data.dataType !== "error") {
+        if (data.messageType === "broadcast") {
+          //用户更新
+          if (data.dataType === "update") {
+            let info = JSON.parse(data.info);
+            store.state.onlinePeople = info.map((item) => {
+              item.photo = `data:image/png;base64,${item.photo}`;
+              return item;
+            });
+            store.state.onlinePerson = info.length;
+          } else if (data.dataType === "join") {
+            //
+          } else {
+            store.state.messages.splice(store.state.messages.length, 0, data);
+          }
+        } else if (data.messageType === "single") {
+          store.state.messages.splice(store.state.messages.length, 0, data);
+        }
       }
-      console.log(store.state.messages);
+
+      console.log(data);
     };
     ws.onclose = function (e) {
       console.log(e);
@@ -85,43 +92,79 @@ export default {
     let dateString = `${date.getFullYear()}-${
       date.getMonth() + 1
     }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    // let upload_inp = document.querySelector(".upload_inp");
-    // let upload_to_server = document.querySelector(".upload_to_server");
-    // let _file;
-    // let type;
-    // let data;
-    // upload_inp.addEventListener("change", function () {
-    //   _file = upload_inp.files[0];
-    //   let fileReader = new FileReader();
-    //   fileReader.addEventListener("load", function () {
-    //     let result = fileReader.result;
-    //     console.log(result);
-    //     data = result.split(",");
-    //     type = data[0].split(";")[0].split("/")[1];
-    //     // wsInstance.sendWs({
-    //     //     messageType: "single",
-    //     //     userId: "2",
-    //     //     dateTime: new Date(),
-    //     //     dataType: type,
-    //     //     filename: `${_file.name}`,
-    //     //     info: data[1]
-    //     // })
-    //   });
-    //   fileReader.readAsDataURL(_file);
-    //   console.log(upload_inp.files);
-    // });
+
+    function uploadFile() {
+      let upload_inp = document.querySelector("#upload");
+      upload_inp.click();
+      // let upload_to_server = document.querySelector(".upload_to_server");
+      let _file;
+      let type;
+      let data;
+      upload_inp.addEventListener("change", function () {
+        _file = upload_inp.files[0];
+        let fileReader = new FileReader();
+        fileReader.addEventListener("load", function () {
+          let result = fileReader.result;
+          console.log(result);
+          data = result.split(",");
+          type = data[0].split(";")[0].split("/")[1];
+          if (store.state.currentChat.name === "聊天室") {
+            wsInstance.sendWs({
+              messageType: "broadcast",
+              userId: store.state.info.id,
+              dateTime: dateString,
+              oppositeId: "",
+              dataType: "file",
+              fileName: `${_file.name}`,
+              fileType: _file.type,
+              info: data[1],
+            });
+          } else {
+            wsInstance.sendWs({
+              messageType: "single",
+              userId: store.state.info.id,
+              dateTime: dateString,
+              oppositeId: store.state.currentChat.id,
+              dataType: "file",
+              fileName: `${_file.name}`,
+              fileType: _file.type,
+              info: data[1],
+            });
+          }
+        });
+        fileReader.readAsDataURL(_file);
+        console.log(upload_inp.files);
+      });
+    }
+
     function send() {
       if (text.value !== "") {
-        wsInstance.sendWs({
-          messageType: "broadcast",
-          userId: `${store.state.info.id}`,
-          dateTime: dateString,
-          dataType: "text",
-          oppositeId: "",
-          fileName: "",
-          info: text.value,
-        });
+        if (store.state.currentChat.name === "聊天室") {
+          wsInstance.sendWs({
+            messageType: "broadcast",
+            userId: `${store.state.info.id}`,
+            dateTime: dateString,
+            dataType: "text",
+            oppositeId: "",
+            fileName: "",
+            info: text.value,
+          });
+        } else {
+          wsInstance.sendWs({
+            messageType: "single",
+            userId: `${store.state.info.id}`,
+            dateTime: dateString,
+            dataType: "text",
+            oppositeId: store.state.currentChat.id,
+            fileName: "",
+            info: text.value,
+          });
+        }
       }
+      setTimeout(() => {
+        document.getElementsByClassName("screen")[0].scrollTop =
+          document.getElementsByClassName("screen")[0].scrollHeight;
+      }, 50);
     }
     function addMessage() {
       let text1 = toRaw(text).value;
@@ -143,6 +186,7 @@ export default {
     return {
       text,
       addMessage,
+      uploadFile,
     };
   },
 };
@@ -215,5 +259,8 @@ export default {
   position: absolute;
   bottom: 10px;
   right: 10px;
+}
+#upload {
+  display: none;
 }
 </style>
