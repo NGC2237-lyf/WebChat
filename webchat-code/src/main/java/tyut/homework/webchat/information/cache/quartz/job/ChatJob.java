@@ -38,9 +38,6 @@ public class ChatJob extends QuartzJobBean {
                 mapper.insertRecord(message);
             }
             log.info("聊天记录已存储");
-            redisUtil.delKey("history");
-            mapper.getRecord(0,10);
-            log.info("缓存已更新");
         }
     }
 }

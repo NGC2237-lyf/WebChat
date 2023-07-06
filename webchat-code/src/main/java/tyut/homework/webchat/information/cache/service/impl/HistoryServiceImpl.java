@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tyut.homework.webchat.information.cache.service.HistoryService;
 import tyut.homework.webchat.information.mapper.ChatMapper;
 import tyut.homework.webchat.information.utils.RedisUtil;
+import tyut.homework.webchat.information.websocket.handler.ChatHandler;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -25,13 +26,15 @@ public class HistoryServiceImpl implements HistoryService {
     private RedisUtil redisUtil;
 
     @Override
-    public boolean getHistory(int start, int end) {
+    public boolean getHistory(String userId, int start, int end) {
         List<Object> record = mapper.getRecord(start, end);
         if (record.size() == 0) {
             return false;
         }
         Long history = redisUtil.listLeftPushAll("history", record);
-
+        if (userId != null) {
+            ChatHandler.recordMap.replace(userId,redisUtil.listLen("history"));
+        }
         return history != 0;
     }
 
@@ -41,6 +44,7 @@ public class HistoryServiceImpl implements HistoryService {
         if (redisUtil.hasKey("history")) {
             redisUtil.delKey("history");
         }
-        getHistory(0,2);
+        redisUtil.delKey("chat");
+        getHistory(null, 0, 10);
     }
 }

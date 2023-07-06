@@ -7,5 +7,5 @@ package tyut.homework.webchat.information.cache.service;
  * @description
  **/
 public interface HistoryService {
-    boolean getHistory(int start,int end);
+    boolean getHistory(String userId,int start,int end);
 }

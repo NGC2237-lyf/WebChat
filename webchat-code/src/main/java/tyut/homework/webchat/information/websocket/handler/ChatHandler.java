@@ -61,16 +61,28 @@ public class ChatHandler implements WebSocketHandler {
         Message userMessage = objectMapper.readValue(message.getPayload().toString(), Message.class);
         switch (userMessage.getMessageType()) {
             case SINGLE:
-                boolean singleResult = sendSingleMessage(userMessage, getUserId(session));
-                if (!singleResult) {
-                    sendErrorMessage(session);
-                }
+                poolExecutor.execute(() -> {
+                    boolean singleResult = sendSingleMessage(userMessage, getUserId(session));
+                    if (!singleResult) {
+                        try {
+                            sendErrorMessage(session);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 break;
             case BROADCAST:
-                boolean broadcastResult = sendBroadcastMessage(userMessage, getUserId(session));
-                if (!broadcastResult) {
-                    sendErrorMessage(session);
-                }
+                poolExecutor.execute(() -> {
+                    boolean broadcastResult = sendBroadcastMessage(userMessage, getUserId(session));
+                    if (!broadcastResult) {
+                        try {
+                            sendErrorMessage(session);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
                 break;
             default:
                 sendErrorMessage(session);
@@ -106,10 +118,14 @@ public class ChatHandler implements WebSocketHandler {
             try {
                 if (Objects.equals(userMessage.getDataType(), DataType.TEXT)) {
                     redisUtil.listRightPush(userId+"-"+userMessage.getOppositeId()+"-chat",userMessage);
-                    userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    synchronized (userSession) {
+                        userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    }
                     return true;
                 } else if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
-                    userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    synchronized (userSession) {
+                        userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    }
                     String fileName = "file/" + userId+ "-" + DateUtil.getMillis() + "-" + userMessage.getFileName();
                     FileUtil.touchFile(fileName,userMessage.getInfo());
                     userMessage.setInfo(fileName);
@@ -126,13 +142,14 @@ public class ChatHandler implements WebSocketHandler {
     }
 
     public boolean sendBroadcastMessage(Message userMessage, String userId) {
-        poolExecutor.execute(() -> {});
         boolean flag = false;
         if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
             for (WebSocketSession sessions : SESSION_POOL.values()) {
                 if (sessions.isOpen()) {
                     try {
-                        sessions.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                        synchronized (sessions) {
+                            sessions.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                        }
                         flag = true;
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -151,7 +168,9 @@ public class ChatHandler implements WebSocketHandler {
             for (WebSocketSession sessions : SESSION_POOL.values()) {
                 if (sessions.isOpen()) {
                     try {
-                        sessions.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                        synchronized (sessions) {
+                            sessions.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                        }
                         flag = true;
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -167,8 +186,10 @@ public class ChatHandler implements WebSocketHandler {
     }
 
     public void sendErrorMessage(WebSocketSession session) throws IOException {
-        session.sendMessage(new TextMessage(objectMapper
-                .writeValueAsString(new ServerMessage(MessageType.SINGLE,DataType.ERROR,"发送消息失败"))));
+        synchronized (session) {
+            session.sendMessage(new TextMessage(objectMapper
+                    .writeValueAsString(new ServerMessage(MessageType.SINGLE,DataType.ERROR,"发送消息失败"))));
+        }
     }
 
     public void sendJoinMessage(String userId) throws IOException {
@@ -176,8 +197,10 @@ public class ChatHandler implements WebSocketHandler {
         user.setId(Integer.parseInt(userId));
         for (WebSocketSession session : SESSION_POOL.values()) {
             if (session.isOpen()) {
-                session.sendMessage(new TextMessage(objectMapper
-                        .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.JOIN,guyMapper.guySearch(user).get(0).getNickName() + " 已上线"))));
+                synchronized (session) {
+                    session.sendMessage(new TextMessage(objectMapper
+                            .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.JOIN,guyMapper.guySearch(user).get(0).getNickName() + " 已上线"))));
+                }
             }
         }
     }
@@ -199,8 +222,10 @@ public class ChatHandler implements WebSocketHandler {
                     for (WebSocketSession session : SESSION_POOL.values()) {
                         if (session.isOpen()) {
                             try {
-                                session.sendMessage(new TextMessage(objectMapper
-                                        .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.UPDATE, objectMapper.writeValueAsString(userList)))));
+                                synchronized (session) {
+                                    session.sendMessage(new TextMessage(objectMapper
+                                            .writeValueAsString(new ServerMessage(MessageType.BROADCAST,DataType.UPDATE, objectMapper.writeValueAsString(userList)))));
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

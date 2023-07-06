@@ -20,7 +20,7 @@ public class QuartzConfig {
 
     @Bean
     public Trigger trigger() {
-        CronScheduleBuilder builder = CronScheduleBuilder.cronSchedule("0 0/30 * * * ?");
+        CronScheduleBuilder builder = CronScheduleBuilder.cronSchedule("0 0/1 * * * ?");
         return TriggerBuilder.newTrigger().forJob(jobDetail()).withSchedule(builder).build();
     }
 }
