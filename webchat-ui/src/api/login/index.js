@@ -1,5 +1,5 @@
 import request from "@/tool/request";
-let url = "http://192.168.0.110:8080";
+let url = "http://192.168.0.117:8080";
 export default class Login {
     constructor() {
 
@@ -12,9 +12,9 @@ export default class Login {
         })
     }
 
-    checkLogin({ email, password, verifyCode }) {
+    checkLogin({ id, password, verifyCode }) {
         let param = new URLSearchParams();
-        param.append('email', email);
+        param.append('id', id);
         param.append('password', password);
         param.append('verifyCode', verifyCode);
         return request({
@@ -25,15 +25,15 @@ export default class Login {
     }
 
     startRegister({ nickName, password, code, email }) {
+        let param = new URLSearchParams();
+        param.append('nickName', nickName);
+        param.append('code', code);
+        param.append('password', password);
+        param.append('email', email);
         return request({
             url: `${url}/register`,
             method: "post",
-            data: {
-                nickName,
-                code,
-                password,
-                email
-            },
+            data: param
         })
     }
 

@@ -15,8 +15,8 @@
         <input
           class="tbx"
           type="text"
-          placeholder="邮箱"
-          v-model="loginInfo.email"
+          placeholder="ID"
+          v-model="loginInfo.id"
           @focus="closeOutControl"
           @blur="openOutControl"
         />
@@ -122,6 +122,7 @@
 <script>
 import Login from "@/api/login/index.js";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 import { ref, reactive, onMounted, computed } from "vue";
 export default {
   name: "login",
@@ -130,7 +131,7 @@ export default {
     let isIn = ref(true);
 
     let loginInfo = reactive({
-      email: "",
+      id: "",
       password: "",
       verifyCode: "",
     });
@@ -161,6 +162,8 @@ export default {
 
     //是否注册
     let isRegister = ref(false);
+
+    const store = useStore();
 
     //span当前位置
     let position = reactive({
@@ -286,13 +289,17 @@ export default {
 
     function startChat() {
       login.checkLogin(loginInfo).then((res) => {
-        console.log(res);
-        router.push({
-          name: "main",
-          query: {
-            photo: res.photo,
-          },
-        });
+        if (res.code === 200) {
+          let data = res.data;
+          store.state.info.id = data.id;
+          store.state.info.name = data.nickName;
+          store.state.info.photo = `data:image/webp;base64,${data.photo}`;
+          router.push({
+            name: "main",
+          });
+        } else {
+          alert(res.msg);
+        }
       });
     }
 
@@ -301,7 +308,9 @@ export default {
     }
 
     function startRegister() {
-      login.startRegister(registerInfo);
+      login.startRegister(registerInfo).then((res) => {
+        alert(res.msg);
+      });
     }
 
     function getVerifyImg() {
@@ -312,9 +321,6 @@ export default {
 
     onMounted(() => {
       getVerifyImg();
-      // login.checkLogin(loginInfo).then((res) => {
-      //   console.log(res);
-      // });
     });
 
     return {
@@ -670,6 +676,7 @@ source {
   text-decoration: none;
   /* 同样加个过渡 */
   transition: all 0.5s;
+  cursor: pointer;
 }
 .register-input a:hover {
   color: #fff;

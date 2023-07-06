@@ -1,30 +1,28 @@
 <template>
   <div class="chat">
-    <Screen :message="message" />
-    <ChatInput @sendMessage="sendMessage" />
+    <Title />
+    <Screen />
+    <ChatInput />
   </div>
 </template>
 
 <script>
 import ChatInput from "./chatInput.vue";
 import Screen from "./screen.vue";
+import Title from "./title.vue";
 import { ref, reactive, onMounted, computed } from "vue";
 export default {
   name: "chat",
   components: {
     ChatInput,
     Screen,
+    Title,
   },
   setup() {
     let message = reactive([]);
-    function sendMessage(obj) {
-      console.log(obj);
-      message.splice(message.length, 0, obj);
-      console.log(message);
-    }
+    let info = reactive({});
     return {
       message,
-      sendMessage,
     };
   },
 };
@@ -32,6 +30,7 @@ export default {
 
 <style scoped>
 .chat {
-  width: 70%;
+  width: 73%;
+  padding: 0;
 }
 </style>

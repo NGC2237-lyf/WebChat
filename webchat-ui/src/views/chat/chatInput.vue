@@ -35,34 +35,113 @@
         ></path>
       </svg>
     </div>
-    <textarea class="textarea" v-model="inputValue.text"></textarea>
+    <textarea class="textarea" v-model="text"></textarea>
     <button class="send" @click="addMessage">发送</button>
   </div>
 </template>
 
 <script>
+import WebsocketLink from "@/api/websocket/index.js";
 import { ref, reactive, onMounted, computed, markRaw, toRaw } from "vue";
+import { useStore } from "vuex";
 export default {
   name: "chatInput",
   setup(props, context) {
-    let inputValue = reactive({
-      text: "",
-      avatar: "",
-      name: "一类小魔鬼",
-    });
+    let store = useStore();
+    let text = ref("");
+    let wsInstance = new WebsocketLink(
+      `/chat?userId=${store.state.info.id}`,
+      "chat",
+      {
+        token: "666",
+        data: "4f4a",
+      }
+    );
+    let ws = wsInstance.init();
+    ws.onmessage = function (MessageEvent) {
+      let data = JSON.parse(MessageEvent.data);
+      // console.log(MessageEvent.data);
+      // console.log(data.messageType === "broadcast" && data.dataType === "text");
+      if (data.messageType === "broadcast" && data.dataType === "text") {
+        store.state.messages.splice(store.state.messages.length, 0, data);
+      } else if (
+        data.messageType === "broadcast" &&
+        data.dataType === "update"
+      ) {
+        let info = JSON.parse(data.info);
+        store.state.onlinePeople = info.map((item) => {
+          item.photo = `data:image/png;base64,${item.photo}`;
+          return item;
+        });
+        store.state.onlinePerson = info.length;
+      }
+      console.log(store.state.messages);
+    };
+    ws.onclose = function (e) {
+      console.log(e);
+    };
 
+    let date = new Date();
+    let dateString = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    // let upload_inp = document.querySelector(".upload_inp");
+    // let upload_to_server = document.querySelector(".upload_to_server");
+    // let _file;
+    // let type;
+    // let data;
+    // upload_inp.addEventListener("change", function () {
+    //   _file = upload_inp.files[0];
+    //   let fileReader = new FileReader();
+    //   fileReader.addEventListener("load", function () {
+    //     let result = fileReader.result;
+    //     console.log(result);
+    //     data = result.split(",");
+    //     type = data[0].split(";")[0].split("/")[1];
+    //     // wsInstance.sendWs({
+    //     //     messageType: "single",
+    //     //     userId: "2",
+    //     //     dateTime: new Date(),
+    //     //     dataType: type,
+    //     //     filename: `${_file.name}`,
+    //     //     info: data[1]
+    //     // })
+    //   });
+    //   fileReader.readAsDataURL(_file);
+    //   console.log(upload_inp.files);
+    // });
+    function send() {
+      if (text.value !== "") {
+        wsInstance.sendWs({
+          messageType: "broadcast",
+          userId: `${store.state.info.id}`,
+          dateTime: dateString,
+          dataType: "text",
+          oppositeId: "",
+          fileName: "",
+          info: text.value,
+        });
+      }
+    }
     function addMessage() {
-      let obj = {
-        text: inputValue.text,
-        avatar: inputValue.avatar,
-        name: inputValue.name,
-      };
-      //TODO
-      context.emit("sendMessage", obj);
-      inputValue.text = "";
+      let text1 = toRaw(text).value;
+      // let textInfo = {
+      //   messageType: "broadcast",
+      //   userId: `${store.state.info.id}`,
+      //   dateTime: new Date(),
+      //   dataType: "text",
+      //   oppositeId: "",
+      //   fileName: "",
+      //   info: text.value,
+      // };
+      // //TODO
+      // store.state.messages.splice(store.state.messages.length, 0, textInfo);
+      // context.emit("sendMessage", text1);
+      send();
+      text.value = "";
     }
     return {
-      inputValue,
+      text,
       addMessage,
     };
   },
@@ -72,8 +151,8 @@ export default {
 <style scoped>
 .chatinput {
   width: 100%;
-  border: 1px solid;
-  height: 29%;
+  border-top: 1px solid grey;
+  height: 27%;
   position: relative;
 }
 .extend {
@@ -91,7 +170,40 @@ export default {
   font-size: 18px;
   resize: none;
   outline: none;
-  height: 89%;
+  height: 75%;
+  overflow-y: auto;
+}
+/* 定义滚动条宽高及背景，宽高分别对应横竖滚动条的尺寸 */
+.textarea::-webkit-scrollbar {
+  width: 10px; /* 对垂直滚动条有效 */
+}
+
+/* 定义滚动条的轨道颜色、内阴影及圆角 */
+.textarea::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+/* 定义滑块颜色、内阴影及圆角 */
+.textarea::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.173);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 光标移到滚动滑块上样式颜色变深 */
+.textarea::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* 定义两端按钮的样式 */
+.textarea::-webkit-scrollbar-button {
+  background-color: cyan;
+}
+
+/* 定义右下角汇合处的样式 */
+.textarea::-webkit-scrollbar-corner {
+  background: khaki;
 }
 .send {
   background-color: rgba(135, 207, 235, 0.62);

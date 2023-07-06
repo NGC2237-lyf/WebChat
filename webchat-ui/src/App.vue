@@ -1,15 +1,28 @@
 <template>
   <!-- <login></login> -->
-  <router-view></router-view>
+  <div @click="closePop">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
+import { useStore } from "vuex";
 import Login from "./components/login.vue";
-
 export default {
   name: "App",
   components: {
     Login,
+  },
+  setup() {
+    let store = useStore();
+    function closePop() {
+      if (store.state.isShow.rightmenu === true) {
+        store.state.isShow.rightmenu = !store.state.isShow.rightmenu;
+      }
+    }
+    return {
+      closePop,
+    };
   },
 };
 </script>
