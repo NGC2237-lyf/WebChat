@@ -5,3 +5,9 @@ spring:
       url: jdbc:mysql://localhost:3306/webchat?characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
       username: root
       password: QAZlyf207
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    connect-timeout: 3000
+    database: 0
