@@ -20,6 +20,7 @@ public class Message {
     private String oppositeId;
     private DataType dataType;
     private String fileName;
+    private String fileType;
     private String info;
     private String dateTime;
 }

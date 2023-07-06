@@ -14,7 +14,7 @@
     </resultMap>
 
     <insert id="insertRecord">
-        insert into chat_record values (#{message.userId},#{message.oppositeId},#{message.messageType},#{message.dataType},#{message.info},#{message.dateTime})
+        insert into chat_record values (#{message.userId},#{message.oppositeId},#{message.messageType},#{message.dataType},#{message.info},#{message.dateTime},#{message.fileName},#{message.fileType})
     </insert>
 
     <select id="getRecord" resultMap="MessageMap">

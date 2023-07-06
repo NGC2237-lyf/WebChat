@@ -117,19 +117,25 @@ public class ChatHandler implements WebSocketHandler {
         if (Objects.nonNull(userSession) && userSession.isOpen()) {
             try {
                 if (Objects.equals(userMessage.getDataType(), DataType.TEXT)) {
-                    redisUtil.listRightPush(userId+"-"+userMessage.getOppositeId()+"-chat",userMessage);
+                    //redisUtil.listRightPush(userId+"-"+userMessage.getOppositeId()+"-chat",userMessage);
                     synchronized (userSession) {
                         userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    }
+                    synchronized (SESSION_POOL.get(userId)) {
+                        SESSION_POOL.get(userId).sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
                     }
                     return true;
                 } else if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
+                    String fileName = "file/single/" + userId+ "/" + userMessage.getFileName();
+                    String name = FileUtil.touchFile(fileName, userMessage.getInfo());
+                    userMessage.setFileName(name);
                     synchronized (userSession) {
                         userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
                     }
-                    String fileName = "file/" + userId+ "-" + DateUtil.getMillis() + "-" + userMessage.getFileName();
-                    FileUtil.touchFile(fileName,userMessage.getInfo());
-                    userMessage.setInfo(fileName);
-                    redisUtil.listRightPush(userId+"-"+userMessage.getUserId()+"-chat",userMessage);
+                    synchronized (SESSION_POOL.get(userId)) {
+                        SESSION_POOL.get(userId).sendMessage(new TextMessage(objectMapper.writeValueAsString(userMessage)));
+                    }
+                    //redisUtil.listRightPush(userId+"-"+userMessage.getUserId()+"-chat",userMessage);
                     return true;
                 }
                 return false;
@@ -144,6 +150,9 @@ public class ChatHandler implements WebSocketHandler {
     public boolean sendBroadcastMessage(Message userMessage, String userId) {
         boolean flag = false;
         if (Objects.equals(userMessage.getDataType(), DataType.FILE)) {
+            String fileName = "file/broadcast/" + userId+ "/" + userMessage.getFileName();
+            String name = FileUtil.touchFile(fileName, userMessage.getInfo());
+            userMessage.setFileName(name);
             for (WebSocketSession sessions : SESSION_POOL.values()) {
                 if (sessions.isOpen()) {
                     try {
@@ -157,9 +166,7 @@ public class ChatHandler implements WebSocketHandler {
                 }
             }
             if (flag) {
-                String fileName = "file/" + userId+ "-" + DateUtil.getMillis() + "-" + userMessage.getFileName();
-                FileUtil.touchFile(fileName,userMessage.getInfo());
-                userMessage.setInfo(fileName);
+                userMessage.setInfo(null);
                 redisUtil.listRightPush("chat",userMessage);
                 redisUtil.listRightPush("history",userMessage);
             }

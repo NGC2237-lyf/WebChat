@@ -11,10 +11,10 @@ import tyut.homework.webchat.information.utils.FileUtil;
  * @date 2023/6/29
  * @description
  **/
-@SpringBootTest(classes = {WebChatApplication.class})
+@SpringBootTest(classes = {WebChatApplication.class},webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WebChatTest {
     @Test
     public void test() {
-        System.out.println(DateUtil.getMillis());
+        System.out.println(FileUtil.touchFile("file/1/xcc.txt", "5aWa55Cb5Z+O"));
     }
 }
