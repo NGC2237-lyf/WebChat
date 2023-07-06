@@ -86,7 +86,7 @@
 
     </select>
 
-    <select id="getUserById" resultType="tyut.homework.webchat.common.domain.User">
+    <select id="getUserById" resultType="tyut.homework.webchat.common.domain.User" resultMap="userSearch">
         select *
         FROM `user`
         WHERE id = #{id};
