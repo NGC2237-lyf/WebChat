@@ -12,6 +12,8 @@ import tyut.homework.webchat.common.utils.Result;
 import tyut.homework.webchat.common.utils.ValidateCodeUtils;
 import tyut.homework.webchat.login.service.ILoginService;
 
+import javax.servlet.http.HttpSession;
+
 @RestController
 @RequestMapping("/register")
 public class RegisterController {
@@ -19,21 +21,19 @@ public class RegisterController {
     @Autowired
     private ILoginService iLoginService;
 
-    String emailCode = null;
-
     /**
      * 注册
      *
      * @return
      */
     @PostMapping
-    public Result userRegister(@NonNull String nickName,@NonNull String password,@NonNull String code,@NonNull String email) {
+    public Result userRegister(@NonNull String nickName,@NonNull String password,@NonNull String code,@NonNull String email,HttpSession session) {
         //判断邮箱是否在数据库存在
         User existEmail = iLoginService.isExistEmail(email);
         if (existEmail == null) {
             String emailCode = code;
             //code校验
-            String oldCode = this.emailCode;
+            String oldCode = (String) session.getAttribute("emailCode");
             if (emailCode == null || oldCode == null) {
                 return Result.error("验证码填写错误");
             }
@@ -54,7 +54,7 @@ public class RegisterController {
      * @return
      */
     @GetMapping("/sendEmail")
-    public Result sendEmailCode(@NonNull String email) {
+    public Result sendEmailCode(@NonNull String email,HttpSession session) {
         try {
             HtmlEmail self_email = new HtmlEmail();
             //设置邮件服务器的名称
@@ -69,7 +69,7 @@ public class RegisterController {
             int emailCode = ValidateCodeUtils.generateValidateCode(6);
             self_email.setSubject("WebChat");//此处填写邮件主题
             self_email.setMsg("尊敬的用户您好,您本次注册的验证码是:" + emailCode);//设置邮件正文
-            this.emailCode = String.valueOf(emailCode);
+            session.setAttribute("emailCode",String.valueOf(emailCode));
             self_email.send();
             return Result.success("发送成功");
         } catch (Exception e) {

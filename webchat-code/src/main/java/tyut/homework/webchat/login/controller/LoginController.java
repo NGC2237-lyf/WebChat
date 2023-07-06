@@ -22,8 +22,6 @@ public class LoginController {
     @Autowired
     private ILoginService iLoginService;
 
-    String verifyCode = null;
-
     /**
      * 登陆校验
      *
@@ -33,7 +31,7 @@ public class LoginController {
     @PostMapping("/check")
     public Result Check(String verifyCode,String id,String password, HttpSession session){
         //获取验证码
-        String oldVerifyCode= this.verifyCode;
+        String oldVerifyCode = (String) session.getAttribute("verifyCode");
         //非空判断
         if (verifyCode == null){
             return Result.error("验证码不能为空");
@@ -52,12 +50,12 @@ public class LoginController {
      * @throws IOException
      */
     @GetMapping("/verify")
-    public Result Verify(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+    public Result Verify(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,HttpSession session) throws IOException {
         //定义图形验证码的长、宽、验证码字符数、干扰线宽度
         ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(150, 40, 4, 4);
         String base64Image = captcha.getImageBase64();
         //获取验证码中的文字内容
-        this.verifyCode = captcha.getCode();
+        session.setAttribute("verifyCode",captcha.getCode());
         return Result.success((Object) base64Image);
     }
 }
