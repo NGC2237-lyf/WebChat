@@ -31,10 +31,10 @@ public class HistoryServiceImpl implements HistoryService {
         if (record.size() == 0) {
             return false;
         }
-        Long history = redisUtil.listLeftPushAll("history", record);
         if (userId != null) {
-            ChatHandler.recordMap.replace(userId,redisUtil.listLen("history"));
+            ChatHandler.recordMap.replace(userId,ChatHandler.recordMap.get(userId) + record.size());
         }
+        Long history = redisUtil.listLeftPushAll("history", record);
         return history != 0;
     }
 

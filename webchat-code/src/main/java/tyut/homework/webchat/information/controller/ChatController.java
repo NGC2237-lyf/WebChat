@@ -41,15 +41,16 @@ public class ChatController {
         re.setCode(200);
         Long userCount = ChatHandler.recordMap.get(userId);
         if (start + end > userCount) {
-            boolean result = historyService.getHistory(userId, Integer.parseInt(String.valueOf(userCount)), end);
-            if (start < userCount&&!result) {
+            boolean result = historyService.getHistory(userId, Integer.parseInt(String.valueOf(userCount)) , start + end);
+            userCount = ChatHandler.recordMap.get(userId);
+            if (start <= userCount&&result) {
                 userCount = ChatHandler.recordMap.get(userId);
-                re.setData(redisUtil.listRange("history",start,userCount - 1));
+                re.setData(redisUtil.listRange("history",userCount -start - end < 0 ? 0 : userCount -start -end,userCount - start - 1));
                 return re;
             } else if (!result) {
                 return re;
             }
-            re.setData(redisUtil.listRange("history",start,end -1));
+            re.setData(redisUtil.listRange("history",start,start + end - 1));
             return re;
         } else {
             re.setData(redisUtil.listRange("history",userCount -(start + end), userCount - start - 1));

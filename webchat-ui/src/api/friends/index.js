@@ -1,5 +1,5 @@
 import request from "@/tool/request";
-let url = "http://192.168.0.117:8080";
+let url = "http://192.168.1.2:8080";
 export default class Friends {
     constructor() {
 
