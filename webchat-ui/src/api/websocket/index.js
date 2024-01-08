@@ -1,4 +1,4 @@
-let baseUrl = 'ws://192.168.0.117:8080';
+let baseUrl = 'ws://192.168.214.1:8080';
 export default class WebsocketLink {
     constructor(url, protol, { token, data }) {
         if (this.ws) {
